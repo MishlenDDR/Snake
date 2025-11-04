@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
+    <script src="Snake.js"></script>
+</head>
+<body>
+    <div class="Healths">
+            <div class="healthText"><p>HEALTH:</p></div>
+            <img src="images/Сердце.png" class="imgHeart1" id="Heart1" alt="">
+            <img src="images/Сердце.png" class="imgHeart2" id="Heart2" alt="">
+            <img src="images/Сердце.png" class="imgHeart3" id="Heart3" alt="">
+            <div id="Score">SCORE: 0</div> 
+    </div>
+
+    <div class="gameBox">
+        <div class="frame">
+    
+        <div id="Web" class="fieldOfTheGame"></div>
+            <div class="boxForTables">
+                <div id="Win" class="winBox"><p>You are WIN🎉!!</p></div>
+                <div id="Lose" class="loseBox"><p>You are LOSER!</p></div>  
+                <button onclick="GameStart.GlobalRestart()" id="restart" class="restart">Start again</button>
+                <div id="instraction"><p>👇Change snake👇</p></div>
+                <button onclick="GameStart.SelectSnakes('default')" id="ButtonDefaultSkin" >Default skin</button>
+                <button onclick="GameStart.SelectSnakes('Yulya')" id="ButtonYulyaSkin" >Princess skin</button>
+            </div>
+        </div>
+    </div>
+    
+</body>
+</html>
