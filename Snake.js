@@ -88,6 +88,7 @@ class Game  {
         }
         return newBombs
     }
+    
     failsWithImages() { // это обьект для хранения изображений
         const directionFromTo = {
             body: {
