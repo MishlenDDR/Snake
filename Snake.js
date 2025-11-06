@@ -7,7 +7,11 @@ class Game  {
     this.Body =  []; // массив для тела
     this.NewPos =  []; // массив для изменения позиции головы 
     this.Apple =  []; // массив для хранения яблок
+    this.NumberOfBombs = 10;
+    this.NumberOfApples = 10;
+    this.NumberOfMedKits = 3;
     this.Bomb = []; // массив с бомбами
+    this.MedKits = []; // хилл
     this.direction = "right"; // при старте изначальное направление вправо
     this.count =  0; // счетчик сьеденных яблок
     this.countBobmActivate =  0; // счетчик сьеденных бомб
@@ -21,23 +25,42 @@ class Game  {
     this.tail = []; // массив для хвоста
     this.TurnPoints = []; // массив для хранения координат точки поворота
     this.snakeDead = false;
+    this.walls = [
+    // Левый верхний угол (6 клеток с отступом 5)
+     {x: 4, y: 4}, {x: 5, y: 4}, {x: 6, y: 4},
+    {x: 4, y: 4}, {x: 4, y: 5}, {x: 4, y: 6},
+    
+    // Правый верхний угол (3 клетки с отступом 4)
+    {x: 14, y: 4}, {x: 15, y: 4},
+    {x: 16, y: 4}, {x: 16, y: 5}, {x: 16, y: 6},
+    
+    // Левый нижний угол (3 клетки с отступом 4)
+    {x: 4, y: 14}, {x: 4, y: 15},
+    {x: 4, y: 16}, {x: 5, y: 16}, {x: 6, y: 16},
+    
+    // Правый нижний угол (3 клетки с отступом 4)
+    {x: 16, y: 14}, {x: 16, y: 15},
+    {x: 14, y: 16}, {x: 15, y: 16}, {x: 16, y: 16}
+];
     }
 
     start() { // генерация головы на поле 
        this.Start = [Math.floor(Math.random() * this.FieldMaxX + 1), Math.floor(Math.random() * this.FieldMaxY + 1)];
         this.count = 0;
+
     }
 
     apple() { // генерируется случайно 10 яблок на поле
          this.Apple = [];
-        for(let i = 0; i < 10; i++) {
+        for(let i = 0; i < this.NumberOfApples; i++) {
             let Apples;
                 do {        
                 Apples = [Math.floor(Math.random() * this.FieldMaxX + 1), Math.floor(Math.random() * this.FieldMaxY + 1)];      
         
                 } while(JSON.stringify(this.Start) === JSON.stringify(Apples) || // тут условие чтобы яблоки  при генерации не появлялись на месте головы, тела или других яблок
                 this.Apple.some(el => JSON.stringify(el) === JSON.stringify(Apples)) ||
-                 this.Body.some(any => JSON.stringify(any) === JSON.stringify(Apples)));   
+                 this.Body.some(any => JSON.stringify(any) === JSON.stringify(Apples)) || 
+                 this.walls.some(wall => wall.x === Apples[0] && wall.y === Apples[1])); 
             
             this.Apple.push(Apples);
         }
@@ -45,7 +68,7 @@ class Game  {
     }
     bombGeneration() {
         this.Bomb = [];
-        for(let i = 0; i < 10; i++) {
+        for(let i = 0; i < this.NumberOfBombs; i++) {
             let bombs;
             do { // создаем бомбы в случайном месте 20 на 20
                 bombs = [Math.floor(Math.random() * this.FieldMaxX + 1), Math.floor(Math.random() * this.FieldMaxY + 1)];
@@ -53,7 +76,8 @@ class Game  {
             } while(JSON.stringify(this.Start) === JSON.stringify(bombs) || 
                 this.Bomb.some(el => JSON.stringify(el) === JSON.stringify(bombs)) ||
                 this.Body.some(any => JSON.stringify(any) === JSON.stringify(bombs)) || 
-                this.Apple.some(any => JSON.stringify(any) === JSON.stringify(bombs)));
+                this.Apple.some(any => JSON.stringify(any) === JSON.stringify(bombs)) || 
+                this.walls.some(wall => wall.x === bombs[0] && wall.y === bombs[1]));
 
                 this.Bomb.push(bombs); // добавили созданные бомбы в массив бомб
         }
@@ -68,7 +92,8 @@ class Game  {
             } while (JSON.stringify(this.Start) === JSON.stringify(newApple) || // тут тоже уловие чтобы новое появлялось там где нет тела головы и других яблок
                 this.Apple.some(el => JSON.stringify(el) === JSON.stringify(newApple)) ||
                 this.Body.some(any => JSON.stringify(any) === JSON.stringify(newApple)) || 
-                this.Bomb.some(any => JSON.stringify(any) === JSON.stringify(newApple)));
+                this.Bomb.some(any => JSON.stringify(any) === JSON.stringify(newApple)) ||
+            this.walls.some(wall => wall.x === newApple[0] && wall.y === newApple[1]));
 
             return newApple;
     }
@@ -82,11 +107,29 @@ class Game  {
         } while(JSON.stringify(this.Start) === JSON.stringify(newBomb) ||                       
                 this.Bomb.some(el => JSON.stringify(el) === JSON.stringify(newBomb)) ||
                 this.Body.some(any => JSON.stringify(any) === JSON.stringify(newBomb)) || 
-                this.Apple.some(any => JSON.stringify(any) === JSON.stringify(newBomb)));
-
+                this.Apple.some(any => JSON.stringify(any) === JSON.stringify(newBomb)) ||
+                this.walls.some(wall => wall.x === newBomb[0] && wall.y === newBomb[1]));
+                
+                
             newBombs.push(newBomb);
         }
         return newBombs
+    }
+    MedKitSpawn() {
+        this.MedKits = [];
+         for(let i = 0; i < this.NumberOfMedKits; i++) {
+            let med;
+            do { 
+                med = [Math.floor(Math.random() * this.FieldMaxX + 1), Math.floor(Math.random() * this.FieldMaxY + 1)];
+            } while(JSON.stringify(this.Start) === JSON.stringify(med) || 
+                this.Bomb.some(el => JSON.stringify(el) === JSON.stringify(med)) ||
+                this.Body.some(any => JSON.stringify(any) === JSON.stringify(med)) || 
+                this.Apple.some(any => JSON.stringify(any) === JSON.stringify(med)) || 
+                this.walls.some(wall => wall.x === med[0] && wall.y === med[1]));
+
+                this.MedKits.push(med); // добавили созданные бомбы в массив бомб
+        }
+        return this.MedKits;
     }
     failsWithImages() { // это обьект для хранения изображений
         const directionFromTo = {
@@ -116,6 +159,8 @@ class Game  {
                 appleSkin: "images/Яблоко2.png",
                 bombSkin: "images/Бомба.png",
                 fieldBlock: "images/Кубик3.png",
+                WallBlock: "images/Костер.png",
+                MedKit: "images/Аптечка.png",
             }
 
         };
@@ -207,7 +252,7 @@ class Game  {
             const headImages = this.findTurnHead(); // передаем картинки головы
             const tailImages = this.findTurnTail(); // передаем картинки хвоста
             const images = this.failsWithImages().otherObjects // передаем все изображения
-            
+     
         for(let y = 0; y <= this.FieldMaxY; y++) { // обработка поля по вертикали
             let row = ""; // строки пустые изанчально 
             for(let x = 0; x <= this.FieldMaxX; x++) { // обработка по горизонтали 
@@ -216,6 +261,10 @@ class Game  {
                 const bodyTrue = this.Body.some(el => el[0] === x && el[1] === y); // найден элемент тела
                 const headTrue = y === this.Start[1] && x === this.Start[0]; // найдена голова
                 const tailTrue = this.tail && this.tail.length > 0 && y === this.tail[1] && x === this.tail[0]; // найден хвост 
+                const trueApple = this.Apple.some(any => any[0] === x && any[1] === y);
+                const trueBomb = this.Bomb.some(any => any[0] === x && any[1] === y);
+                const trueWalls = this.walls.some(el => el.x === x && el.y === y);
+                const trueMed = this.MedKits.some(med => med[0] === x && med[1] === y);
 
                 if(headTrue && this.snakeDead) { // если голова существуем и столкновение было
                     row += `<img src="${images.explosive}"class="head" width="25" height="25">`; // добавили взрыв если змея врезалась 
@@ -237,14 +286,23 @@ class Game  {
                     const bodyImage = this.findTurnBody(bodyIndex); // передаем в фукнцию чтобы определить направление картинки
                     row += `<img src="${bodyImage}"class="body" width="25" height="25">`; // добавляем тело
                 }
-                 else if(this.Apple.some(any => any[0] === x && any[1] === y)) {
-                    row += `<img src=${images.appleSkin} width="25" height="25">`; // добавляем яблоки если ничего не найдено
-                } else if(this.Bomb.some(any => any[0] === x && any[1] === y)) {
-                    row += `<img src=${images.bombSkin} width="25" height="25">`; 
-                } else {
-                    row += `<img src=${images.fieldBlock} width="25" height="25">`; // отрисовка поля если ничего не найдено
+                 else if(trueApple) {
+                    row += `<img src="${images.appleSkin}" width="25" height="25">`; // добавляем яблоки если ничего не найдено
                 }
-            
+                 else if(trueBomb) {
+                    row += `<img src="${images.bombSkin}" width="25" height="25">`;
+                }
+                else if(trueWalls) {
+                    row += `<img src="${images.WallBlock}"class="fire" width="25" height="25">`;
+                }
+                else if(trueMed) {
+                    row += `<img src="${images.MedKit}"class="medkit" width="25" height="25">`;
+                }
+                 else {
+                    row += `<img src="${images.fieldBlock}" width="25" height="25">`; // отрисовка поля если ничего не найдено
+                }
+                
+                
             }
             field += row + "\n";
         }
@@ -298,6 +356,22 @@ class Game  {
                   break;
         } 
     }
+    MedKitActivate() {
+           switch(this.countBobmActivate) {
+            case 1:
+                 document.getElementById('Heart3').style.display = 'flex';
+                 this.countBobmActivate = 0;
+                  break;
+            case 2:
+                 document.getElementById('Heart2').style.display = 'flex';
+                 this.countBobmActivate = 1;
+                  break;
+            case 3:
+                 document.getElementById('Heart1').style.display = 'flex';
+                 this.countBobmActivate = 2;
+                  break;
+        }
+    }
     restartButton() {
         document.getElementById('Heart3').style.display = 'flex'; // по умолчанию сердечки показываются на экране по этому "flex"
         document.getElementById('Heart2').style.display = 'flex';
@@ -315,7 +389,6 @@ class Game  {
         this.TurnPoints = []; // тут 
         this.count = 0; // и тут 
         this.countBobmActivate = 0; // тут тоже
-        this.run(); // снова запускаем игру
         this.tailDirection = "right" // изначально хвост смотрит туда же куда и голова
         this.bodyDirections = [], // массив для направления тела
         this.oldDirection = "right"// старое направление 
@@ -323,6 +396,7 @@ class Game  {
         this.tail = [] // массив для хвоста
         this.TurnPoints = []
         this.snakeDead = false;
+        this.run(); // снова запускаем игру
     }
     movement() { // обработка нажатия клавишь для движения
         if(this.count === 240) {
@@ -401,11 +475,19 @@ class Game  {
        
           this.Body.push([...this.oldHead]); // тело принмиает значение старой позиции головы, как бы движется за ней
             this.bodyDirections.push(this.oldDirection);
-         const eatenApple = this.Apple.findIndex(any => // проверяем что координаты яблока совпадают с головой значит сьели яблоко
-          JSON.stringify(any) === JSON.stringify(this.Start))
 
-           const bombActive = this.Bomb.findIndex(any => // проверяем про прошли через бомбу
-          JSON.stringify(any) === JSON.stringify(this.Start))
+            const eatenApple = this.Apple.findIndex(any => // проверяем что координаты яблока совпадают с головой значит сьели яблоко
+            JSON.stringify(any) === JSON.stringify(this.Start));
+
+            const bombActive = this.Bomb.findIndex(any => // проверяем про прошли через бомбу
+            JSON.stringify(any) === JSON.stringify(this.Start));
+
+            const eatenMed = this.MedKits.findIndex(med =>  // проверка на аптечку
+            JSON.stringify(med) === JSON.stringify(this.Start));
+
+            const WallActive = this.walls.findIndex(wall => 
+            wall.x === this.Start[0] && wall.y === this.Start[1]);
+            
         
           const oldTailPos = this.Body.length > 0 ? [...this.Body[0]] : null; // если тело больше 0 то старый хвост будет им или не будет
         if(eatenApple !== -1) { // если сьели яблоко 
@@ -458,6 +540,14 @@ class Game  {
             this.countBobmActivate++;
             this.bombActiveAnimation();
             }
+            if(eatenMed !== -1) {
+                this.MedKits.splice(eatenMed, 1);
+                this.MedKitActivate();
+            }
+            if(WallActive !== -1) {
+                this.lose();
+                return;
+            }
         
             this.animation(); // вызываем отрисовку  
     }
@@ -466,6 +556,7 @@ class Game  {
             this.start(); // сгенерировали голову
             this.apple(); // сгенерировали яблоки
             this.bombGeneration(); // генерируем бомбы
+            this.MedKitSpawn(); // спавн аптечек
             this.animation(); // рисуем их
             
         document.addEventListener('keydown', (e) => { // обрабатываем нажатие на кливиатуре 

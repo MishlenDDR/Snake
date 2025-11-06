@@ -161,7 +161,6 @@
             background: linear-gradient(45deg, #7a1d77, #d1324a);
             border: none;
         }
-       
         button:hover {
             background: linear-gradient(45deg, #1e7a9c, #4fa8d8);
         }
@@ -177,6 +176,15 @@
             line-height: 0;
             font-size: 0;
         }
-     
-
-        
+        .fire {
+            animation: flicker 2s infinite alternate;
+        }
+        @keyframes flicker {
+        0% { transform: scale(1) rotate(-1deg); }
+        25% { transform: scale(1.05) rotate(1deg); }
+        50% { transform: scale(1.1) rotate(-0.5deg); }
+        75% { transform: scale(1.05) rotate(0.5deg); }
+        100% { transform: scale(1) rotate(0deg); }
+        }
+      
+    
