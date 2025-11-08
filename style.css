@@ -1,3 +1,13 @@
+        * {
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            caret-color: transparent;
+        }
+        *:focus {
+            outline: none;
+        }
         body {
             display: flex;
             align-items: center;
@@ -18,6 +28,15 @@
             background-size: 110% auto;
             }
         }
+         img {
+            display: inline-block;
+            margin: 0;
+            padding: 0;
+            border: none;
+            vertical-align: top;
+            line-height: 0;
+            font-size: 0;
+        }
         .gameBox {
             display: flex;
             flex-direction: column;
@@ -33,7 +52,7 @@
             flex-direction: row;
             display: flex;
             align-items: center;
-            border-color: #0775eb
+            border-color: #0775eb;
         }
         .healthText {
             font-size: 30px;
@@ -81,7 +100,6 @@
         .boxForTables {
             position: absolute;
             top: 0;
-            left: 11px;
             width: 100%;
             height: 100%;
             display: flex;
@@ -91,20 +109,24 @@
             gap: 10px; /* теперь заработает */
         }
         
-        .winBox, .loseBox, .restart, #instraction, #ButtonDefaultSkin, #ButtonYulyaSkin{
+        .winBox, .loseBox, .restart, #instraction, #ButtonDefaultSkin, #ButtonYulyaSkin, #ButtonMamysSkin{
             width: 260px;
             height: 50px;
             display: none;
             justify-content: center;
             align-items: center;
-            border-radius: 10px;
+            border-radius: 0px;
             font-size: 18px;
             color: #ffffff;
-            border: 2px solid;
+            border: 4px solid;
             font-family: 'Silkscreen', cursive;
             opacity: 0;
             transform: translateY(20px);
             animation: fadeInUp 0.5s ease forwards;
+            border-color: #fff #999 #999 #fff;
+            image-rendering: pixelated;
+            -webkit-font-smoothing: none;
+            -moz-osx-font-smoothing: grayscale;
         }
          @keyframes fadeInUp {
         from {
@@ -118,73 +140,75 @@
         }
         .loseBox {
             background-color: #c02326;
-            border: none;
             animation-delay: 0.3s;
+            border: none;
         }
         .winBox {
             background: linear-gradient(45deg, #2e8b57, #3cb371, #2e8b57);
-            border: none;
             display: flex;
             display: none;
             color: #ffffff;
-            animation-delay: 0.2s;
+            animation-delay: 0.15s;
         }
         #instraction {
             height: 30px;
-            background: linear-gradient(45deg, #d4af37, #f0e68c, #b8860b);
+            background: linear-gradient(45deg, #d4af37, #dece38, #b8860b);       
+            animation-delay: 1.55s;
             border: none;
-            animation-delay: 0.5s;
         }
-        .restart {
+        #restart {
             background: linear-gradient(45deg, #2193b0, #6dd5ed);
-            border: none;
             cursor: pointer;
-            animation-delay: 0.4s;
+            animation-delay: 1.60s;
+            box-shadow: 5px 5px 0px #251041;
+        }
+        #restart:hover {
+            background: linear-gradient(45deg, #1e7a9c, #4fa8d8);
+        }
+        #restart:active {
+            box-shadow: 2px 2px 0px #251041;
+            transform: translate(3px, 3px) !important;
         }
         #ButtonDefaultSkin {
             background: linear-gradient(45deg, #56ab2f, #a8e063);
-            border: none;
             cursor: pointer;
-            animation-delay: 0.5s;
+            animation-delay:  1.65s;
+            box-shadow: 5px 5px 0px #251041;
+
         }
         #ButtonDefaultSkin:hover {
             background: linear-gradient(45deg, #4a9c25, #8ed458);
-            border: none;
+        }
+        #ButtonDefaultSkin:active {
+            box-shadow: 2px 2px 0px #251041;
+            transform: translate(3px, 3px) !important;
         }
         #ButtonYulyaSkin {
-            background: linear-gradient(45deg, #8a2387, #e94057, #f27121);
-            border: none;
+            background: linear-gradient(45deg, #8a2387, #e94057);
             cursor: pointer;
-            animation-delay: 0.55s;
+            animation-delay: 1.7s;
+            box-shadow: 5px 5px 0px #251041;
         }
         #ButtonYulyaSkin:hover {
             background: linear-gradient(45deg, #7a1d77, #d1324a);
-            border: none;
         }
-        button:hover {
-            background: linear-gradient(45deg, #1e7a9c, #4fa8d8);
+        #ButtonYulyaSkin:active {
+            box-shadow: 2px 2px 0px #251041;
+            transform: translate(3px, 3px) !important;
         }
-        button:active {
-            background-color: #0775eb;
+        #ButtonMamysSkin {
+            background: linear-gradient(45deg, #0000ff, #cc00ff);
+            cursor: pointer;
+            animation-delay: 1.75s;
+            box-shadow: 5px 5px 0px #251041;
         }
-        img {
-            display: inline-block;
-            margin: 0;
-            padding: 0;
-            border: none;
-            vertical-align: top;
-            line-height: 0;
-            font-size: 0;
+        #ButtonMamysSkin:hover {
+            background: linear-gradient(45deg, #3e3aa8, #dc4cc9);
         }
-        .fire {
-            animation: flicker 2s infinite alternate;
+        #ButtonMamysSkin:active {
+            box-shadow: 2px 2px 0px #251041;
+            transform: translate(3px, 3px) !important;
         }
-        @keyframes flicker {
-        0% { transform: scale(1) rotate(-1deg); }
-        25% { transform: scale(1.05) rotate(1deg); }
-        50% { transform: scale(1.1) rotate(-0.5deg); }
-        75% { transform: scale(1.05) rotate(0.5deg); }
-        100% { transform: scale(1) rotate(0deg); }
-        }
-      
+        
+        
     
