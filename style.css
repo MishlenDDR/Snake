@@ -158,18 +158,18 @@
             display: flex;
             display: none;
             color: #ffffff;
-            animation-delay: 0.15s;
+            animation-delay: 0.1s;
         }
         #SelectButton {
             height: 30px;
             background: linear-gradient(45deg, #d4af37, #dece38, #b8860b);       
-            animation-delay: 1.55s;
+            animation-delay: 1.05s;
             border: none;
         }
         #restart {
             background: linear-gradient(45deg, #2193b0, #6dd5ed);
             cursor: pointer;
-            animation-delay: 1.60s;
+            animation-delay: 1.1s;
             box-shadow: 5px 5px 0px #251041;
         }
         #restart:hover {
@@ -182,7 +182,7 @@
         #ButtonDefaultSkin {
             background: linear-gradient(45deg, #56ab2f, #a8e063);
             cursor: pointer;
-            animation-delay:  1.65s;
+            animation-delay:  1.15s;
             box-shadow: 5px 5px 0px #251041;
 
         }
@@ -196,7 +196,7 @@
         #ButtonYulyaSkin {
             background: linear-gradient(45deg, #8a2387, #e94057);
             cursor: pointer;
-            animation-delay: 1.7s;
+            animation-delay: 1.2s;
             box-shadow: 5px 5px 0px #251041;
         }
         #ButtonYulyaSkin:hover {
@@ -209,7 +209,7 @@
         #ButtonMamysSkin {
             background: linear-gradient(45deg, #0000ff, #cc00ff);
             cursor: pointer;
-            animation-delay: 1.75s;
+            animation-delay: 1.25s;
             box-shadow: 5px 5px 0px #251041;
         }
         #ButtonMamysSkin:hover {

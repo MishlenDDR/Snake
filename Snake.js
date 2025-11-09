@@ -717,22 +717,108 @@ class Game {
         this.failsWithImages().otherObjects.preloadAnimationImages[currentShot];
     }, 400);
   }
+
   preloadImages() {
     if (!preloaderWas) {
       this.preloadAnimtion();
-      setTimeout(() => {
-        const preloadScreen = document.getElementById("preloadScreen");
+      const imagePreload = [
+        "images/ГоловаВверх.png",
+        "images/ГоловаВниз.png",
+        "images/ГоловаВлево.png",
+        "images/ГоловаВправо.png",
+        "images/ГоловаВверхЮ.png",
+        "images/ГоловаВнизЮ.png",
+        "images/ГоловаВлевоЮ.png",
+        "images/ГоловаВправоЮ.png",
+        "images/ТелоВверхВлево.png",
+        "images/ТелоВверхВправо.png",
+        "images/ТелоВнизВлево.png",
+        "images/ТелоВнизВправо.png",
+        "images/ТелоВерхНиз.png",
+        "images/ТелоВлевоВправо.png",
+        "images/ТелоВверхВлевоЮ.png",
+        "images/ТелоВверхВправоЮ.png",
+        "images/ТелоВнизВлевоЮ.png",
+        "images/ТелоВнизВправоЮ.png",
+        "images/ТелоВлевоВправоЮ.png",
+        "images/ТелоВверхВнизЮ.png",
+        "images/ХвостВерх.png",
+        "images/ХвостНиз.png",
+        "images/ХвостЛево.png",
+        "images/ХвостПраво.png",
+        "images/ХвостВверхЮ.png",
+        "images/ХвостВнизЮ.png",
+        "images/ХвостВлевоЮ.png",
+        "images/ХвостВправоЮ.png",
+        "images/ЧервякГоловаВверх.png",
+        "images/ЧервякГоловаВниз.png",
+        "images/ЧервякГоловаВлево.png",
+        "images/ЧервякГоловаВправо.png",
+        "images/ЧервякВверхВлево.png",
+        "images/ЧервякВверхВправо.png",
+        "images/ЧервякВнизВлево.png",
+        "images/ЧервякВнизВправо.png",
+        "images/ЧервякВверхВниз.png",
+        "images/ЧервякВлевоВправо.png",
+        "images/ЧервякХвостВверх.png",
+        "images/ЧервякХвостВниз.png",
+        "images/ЧервякХвостВлево.png",
+        "images/ЧервякХвостВправо.png",
+        "images/Яблоко2.png",
+        "images/Бомба.png",
+        "images/Взрыв.png",
+        "images/Кубик3.png",
+        "images/Аптечка.png",
+        "images/Огонь1.png",
+        "images/Огонь2.png",
+        "images/Огонь3.png",
+        "images/Деньги.png",
+        "images/Цветок1.png",
+        "images/Цветок2.png",
+        "images/Цветок3.png",
+        "images/Яд.png",
+        "images/БашняЛевыйВерх.png",
+        "images/БашняЛевыйНиз.png",
+        "images/БашняПравыйВерх.png",
+        "images/БашняПравыйНиз.png",
+      ];
+      let onloadImagesCount = 0;
+      let gameStart = false;
 
-        preloadScreen.style.transition = "opacity 0.5s ease-in-out";
-        preloadScreen.style.opacity = "0";
+      imagePreload.forEach((item) => {
+        const img = new Image();
+        img.onload = img.onerror = () => {
+          onloadImagesCount++;
+        };
+        img.src = item;
+      });
 
-        preloaderWas = true;
+      const hidePreloadScreen = () => {
+        if (!gameStart) {
+          gameStart = true;
+          const preloadScreen = document.getElementById("preloadScreen");
+          preloadScreen.style.transition = "opacity 0.5s ease-in-out";
+          preloadScreen.style.opacity = "0";
+          preloaderWas = true;
 
-        setTimeout(() => {
-          preloadScreen.style.display = "none";
-        }, 500);
-        this.run();
-      }, 6000);
+          setTimeout(() => {
+            preloadScreen.style.display = "none";
+          }, 500);
+          this.run();
+        }
+      };
+
+      setTimeout(hidePreloadScreen, 10000);
+
+      const checkLoad = () => {
+        if (onloadImagesCount === imagePreload.length && !gameStart) {
+          hidePreloadScreen();
+        } else if (!gameStart) {
+          setTimeout(checkLoad, 1000);
+        }
+      };
+
+      setTimeout(checkLoad, 6000);
     } else {
       document.getElementById("preloadScreen").style.display = "none";
       this.run();
@@ -1152,7 +1238,7 @@ class MamysSkin extends Game {
     document.getElementById("Lose").style.display = "none"; // после рестарты скрываем
     document.getElementById("Win").style.display = "none"; // так же скрываем
     document.getElementById("restart").style.display = "none"; // опять же, скрываем
-    document.getElementById("instraction").style.display = "none";
+    document.getElementById("SelectButton").style.display = "none";
     document.getElementById("ButtonDefaultSkin").style.display = "none";
     document.getElementById("ButtonYulyaSkin").style.display = "none";
     document.getElementById("ButtonMamysSkin").style.display = "none";
@@ -1164,8 +1250,8 @@ class MamysSkin extends Game {
     this.count = 0; // и тут
     this.countBobmActivate = 0; // тут тоже
     this.tailDirection = "right"; // изначально хвост смотрит туда же куда и голова
-    (this.bodyDirections = []), // массив для направления тела
-      (this.oldDirection = "right"); // старое направление
+    this.bodyDirections = []; // массив для направления тела
+    this.oldDirection = "right"; // старое направление
     this.newDirection = "right"; // новое направление
     this.tail = []; // массив для хвоста
     this.TurnPoints = [];
@@ -1174,7 +1260,7 @@ class MamysSkin extends Game {
   }
   movement() {
     // обработка нажатия клавишь для движения
-    if (this.count === 240) {
+    if (this.count === 200) {
       this.win();
       return;
     }
