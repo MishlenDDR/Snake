@@ -8,10 +8,13 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="preload" href="bg-image-narrow.png" as="image"/>
+    <link rel="preload" href="images/Лес2.jpg" as="image"/>
     <script src="Snake.js"></script>
 </head>
 <body>
+    <div id="preloadScreen">
+        <img src="images/Картинка1.png" class="preloadAnimation" id="preloadAnimation" alt="">
+    </div>
     <div class="Healths">
             <div class="healthText"><p>HEALTH:</p></div>
             <img src="images/Сердце.png" class="imgHeart1" id="Heart1" alt="">
@@ -22,19 +25,18 @@
 
     <div class="gameBox">
         <div class="frame">
-           
         <div id="Web" class="fieldOfTheGame"></div>
             <div class="boxForTables">
                 <div id="Win" class="winBox"><p>You are WIN🎉!!</p></div>
                 <div id="Lose" class="loseBox"><p>You are LOSER!</p></div>  
                 <button onclick="GameStart.GlobalRestart()" id="restart" class="restart">Start again</button>
-                <div id="instraction"><p>👇Change snake👇</p></div>
-                <button onclick="GameStart.SelectSnakes('default')" id="ButtonDefaultSkin" >Default skin</button>
-                <button onclick="GameStart.SelectSnakes('Yulya')" id="ButtonYulyaSkin" >Princess skin</button>
-                <button onclick="GameStart.SelectSnakes('Mamys')" id="ButtonMamysSkin" >Mamys💖</button>
+                <div id="SelectButton" class="SelectButton"><p>👇Change skin👇</p></div>
+                <button onclick="GameStart.SelectSnakes('default')" id="ButtonDefaultSkin">Default</button>
+                <button onclick="GameStart.SelectSnakes('Yulya')" id="ButtonYulyaSkin">Princess</button>
+                <button onclick="GameStart.SelectSnakes('Mamys')" id="ButtonMamysSkin">Mamys💖</button>
             </div>
         </div>
-    </div>
+        </div>
     
 </body>
 </html>

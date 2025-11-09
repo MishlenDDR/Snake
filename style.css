@@ -37,13 +37,6 @@
             line-height: 0;
             font-size: 0;
         }
-        .gameBox {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            margin-top: 0px;
-            
-        }
         .Healths {
             margin-top: 90px;
             height: 70px;
@@ -77,6 +70,30 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
+         .gameBox {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            margin-top: 0px;
+            
+        }
+        #preloadScreen {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            z-index: 1000;
+            background-color: black;
+        }
+        .preloadAnimation {
+            border-radius: 30px;
+        }
         .frame {
             margin-top: 0px;
             border: 5px solid #272222;
@@ -109,7 +126,7 @@
             gap: 10px; /* теперь заработает */
         }
         
-        .winBox, .loseBox, .restart, #instraction, #ButtonDefaultSkin, #ButtonYulyaSkin, #ButtonMamysSkin{
+        .winBox, .loseBox, .restart, #SelectButton, #ButtonDefaultSkin, #ButtonYulyaSkin, #ButtonMamysSkin{
             width: 260px;
             height: 50px;
             display: none;
@@ -150,7 +167,7 @@
             color: #ffffff;
             animation-delay: 0.15s;
         }
-        #instraction {
+        #SelectButton {
             height: 30px;
             background: linear-gradient(45deg, #d4af37, #dece38, #b8860b);       
             animation-delay: 1.55s;

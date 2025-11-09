@@ -42,7 +42,9 @@ class Game  {
     // Правый нижний угол 
     {x: 16, y: 14}, {x: 16, y: 15},
     {x: 14, y: 16}, {x: 15, y: 16}, {x: 16, y: 16}
-];
+    ];
+
+   this.preloadImages(); // загрузка изображений 
     }
 
     start() { // генерация головы на поле 
@@ -58,9 +60,9 @@ class Game  {
                 do {        
                 Apples = [Math.floor(Math.random() * this.FieldMaxX + 1), Math.floor(Math.random() * this.FieldMaxY + 1)];      
         
-                } while(JSON.stringify(this.Start) === JSON.stringify(Apples) || // тут условие чтобы яблоки  при генерации не появлялись на месте головы, тела или других яблок
-                this.Apple.some(el => JSON.stringify(el) === JSON.stringify(Apples)) ||
-                 this.Body.some(any => JSON.stringify(any) === JSON.stringify(Apples)) || 
+                } while(this.Start === Apples || // тут условие чтобы яблоки  при генерации не появлялись на месте головы, тела или других яблок
+                this.Apple.some(apple => apple === Apples) ||
+                this.Body.some(bomb => bomb === Apples) || 
                  this.walls.some(wall => wall.x === Apples[0] && wall.y === Apples[1])); 
             
             this.Apple.push(Apples);
@@ -74,10 +76,10 @@ class Game  {
             do { // создаем бомбы в случайном месте 20 на 20
                 bombs = [Math.floor(Math.random() * this.FieldMaxX + 1), Math.floor(Math.random() * this.FieldMaxY + 1)];
                 // тут проверки что координаты тела, другой бомбы, головы, или яблок не создадутся друг на друге
-            } while(JSON.stringify(this.Start) === JSON.stringify(bombs) || 
-                this.Bomb.some(el => JSON.stringify(el) === JSON.stringify(bombs)) ||
-                this.Body.some(any => JSON.stringify(any) === JSON.stringify(bombs)) || 
-                this.Apple.some(any => JSON.stringify(any) === JSON.stringify(bombs)) || 
+            } while(this.Start === bombs || 
+                this.Bomb.some(bomb => bomb === bombs) ||
+                this.Body.some(body => body === bombs) || 
+                this.Apple.some(apple => apple === bombs) || 
                 this.walls.some(wall => wall.x === bombs[0] && wall.y === bombs[1]));
 
                 this.Bomb.push(bombs); // добавили созданные бомбы в массив бомб
@@ -90,10 +92,10 @@ class Game  {
             do {
                 newApple = [Math.floor(Math.random() * this.FieldMaxX + 1), Math.floor(Math.random() * this.FieldMaxY + 1)];
 
-            } while (JSON.stringify(this.Start) === JSON.stringify(newApple) || // тут тоже уловие чтобы новое появлялось там где нет тела головы и других яблок
-                this.Apple.some(el => JSON.stringify(el) === JSON.stringify(newApple)) ||
-                this.Body.some(any => JSON.stringify(any) === JSON.stringify(newApple)) || 
-                this.Bomb.some(any => JSON.stringify(any) === JSON.stringify(newApple)) ||
+            } while (this.Start === newApple || // тут тоже уловие чтобы новое появлялось там где нет тела головы и других яблок
+                this.Apple.some(apple => apple === newApple) ||
+                this.Body.some(body => body === newApple) || 
+                this.Bomb.some(bomb => bomb === newApple) ||
             this.walls.some(wall => wall.x === newApple[0] && wall.y === newApple[1]));
 
             return newApple;
@@ -105,10 +107,10 @@ class Game  {
         do {
             newBomb = [Math.floor(Math.random() * this.FieldMaxX + 1), Math.floor(Math.random() * this.FieldMaxY + 1)];
             // проверки на то чтобы они не появлялись там где есть яблоки голова и тело
-        } while(JSON.stringify(this.Start) === JSON.stringify(newBomb) ||                       
-                this.Bomb.some(el => JSON.stringify(el) === JSON.stringify(newBomb)) ||
-                this.Body.some(any => JSON.stringify(any) === JSON.stringify(newBomb)) || 
-                this.Apple.some(any => JSON.stringify(any) === JSON.stringify(newBomb)) ||
+        } while(this.Start === newBomb ||                       
+                this.Bomb.some(bomb => bomb === newBomb) ||
+                this.Body.some(body => body === newBomb) || 
+                this.Apple.some(apple => apple === newBomb) ||
                 this.walls.some(wall => wall.x === newBomb[0] && wall.y === newBomb[1]));
                 
                 
@@ -122,10 +124,10 @@ class Game  {
             let med;
             do { 
                 med = [Math.floor(Math.random() * this.FieldMaxX + 1), Math.floor(Math.random() * this.FieldMaxY + 1)];
-            } while(JSON.stringify(this.Start) === JSON.stringify(med) || 
-                this.Bomb.some(el => JSON.stringify(el) === JSON.stringify(med)) ||
-                this.Body.some(any => JSON.stringify(any) === JSON.stringify(med)) || 
-                this.Apple.some(any => JSON.stringify(any) === JSON.stringify(med)) || 
+            } while(this.Start === med || 
+                this.Bomb.some(bomb => bomb === med) ||
+                this.Body.some(body => body === med) || 
+                this.Apple.some(apple => apple === med) || 
                 this.walls.some(wall => wall.x === med[0] && wall.y === med[1]));
 
                 this.MedKits.push(med); // добавили созданные бомбы в массив бомб
@@ -172,6 +174,22 @@ class Game  {
                             "images/Огонь2.png",
                             "images/Огонь3.png",
                             ],
+                preloadAnimationImages: [
+                    "images/Картинка1.png",
+                    "images/Картинка2.png",
+                    "images/Картинка3.png",
+                    "images/Картинка4.png",
+                    "images/Картинка5.png",
+                    "images/Картинка6.png",
+                    "images/Картинка7.png",
+                    "images/Картинка8.png",
+                    "images/Картинка9.png",
+                    "images/Картинка8.png",
+                    "images/Картинка5.png",
+                    "images/Картинка4.png",
+                    "images/Картинка3.png",
+                    "images/Картинка2.png",
+                ]
             }
 
         };
@@ -339,7 +357,7 @@ class Game  {
     win() { 
         document.getElementById('Win').style.display = 'flex'; // показываем картинку с победой
         document.getElementById('restart').style.display = 'flex'; // показываем кнопку рестарта
-        document.getElementById('instraction').style.display = 'flex';
+        document.getElementById('SelectButton').style.display = 'flex';
         document.getElementById('ButtonDefaultSkin').style.display = 'flex';
         document.getElementById('ButtonYulyaSkin').style.display = 'flex';
         document.getElementById('ButtonMamysSkin').style.display = 'flex';
@@ -350,7 +368,7 @@ class Game  {
         clearInterval(this.SpeedLimit);
         document.getElementById('Lose').style.display = 'flex'; // показываем кнопку поражения 
         document.getElementById('restart').style.display = 'flex'; // показываем кнопку рестарта
-        document.getElementById('instraction').style.display = 'flex';
+        document.getElementById('SelectButton').style.display = 'flex';
         document.getElementById('ButtonDefaultSkin').style.display = 'flex';
         document.getElementById('ButtonYulyaSkin').style.display = 'flex';
         document.getElementById('ButtonMamysSkin').style.display = 'flex';
@@ -392,7 +410,7 @@ class Game  {
         document.getElementById('Lose').style.display = 'none'; // после рестарты скрываем 
         document.getElementById('Win').style.display = 'none'; // так же скрываем 
         document.getElementById('restart').style.display = 'none'; // опять же, скрываем
-        document.getElementById('instraction').style.display = 'none';
+        document.getElementById('SelectButton').style.display = 'none';
         document.getElementById('ButtonDefaultSkin').style.display = 'none';
         document.getElementById('ButtonYulyaSkin').style.display = 'none';
         document.getElementById('ButtonMamysSkin').style.display = 'none';
@@ -479,9 +497,9 @@ class Game  {
          
         this.Start = [...this.NewPos]; // мы обрабатывали NewPos для перемещения, теперь приравниваем чтобы голова имела новое значение
 
-        if(this.Body.some(el => // если голова имеет теле координаты что и тело значит мы врезались, это поражение
-            el[0] === this.Start[0] &&
-            el[1] === this.Start[1] 
+        if(this.Body.some(body => // если голова имеет теле координаты что и тело значит мы врезались, это поражение
+            doby[0] === this.Start[0] &&
+            body[1] === this.Start[1] 
          ) || this.countBobmActivate === 3) {
             this.lose();
             return;
@@ -490,14 +508,14 @@ class Game  {
           this.Body.push([...this.oldHead]); // тело принмиает значение старой позиции головы, как бы движется за ней
             this.bodyDirections.push(this.oldDirection);
 
-            const eatenApple = this.Apple.findIndex(any => // проверяем что координаты яблока совпадают с головой значит сьели яблоко
-            JSON.stringify(any) === JSON.stringify(this.Start));
+            const eatenApple = this.Apple.findIndex(apple => // проверяем что координаты яблока совпадают с головой значит сьели яблоко
+            apple === this.Start);
 
-            const bombActive = this.Bomb.findIndex(any => // проверяем про прошли через бомбу
-            JSON.stringify(any) === JSON.stringify(this.Start));
+            const bombActive = this.Bomb.findIndex(bomb => // проверяем про прошли через бомбу
+            bomb === this.Start);
 
             const eatenMed = this.MedKits.findIndex(med =>  // проверка на аптечку
-            JSON.stringify(med) === JSON.stringify(this.Start));
+            med === this.Start);
 
             const WallActive = this.walls.findIndex(wall => 
             wall.x === this.Start[0] && wall.y === this.Start[1]);
@@ -564,6 +582,47 @@ class Game  {
             }
         
             this.animation(); // вызываем отрисовку  
+    }
+    preloadAnimation() {
+       let currentShot = 0;
+       setInterval(() => {
+        currentShot = (currentShot + 1) % this.failsWithImages().otherObjects.preloadAnimationImages.length;
+       document.getElementById('preloadAnimation').src = this.failsWithImages().otherObjects.preloadAnimationImages[currentShot];
+        },400);
+    
+    }
+    preloadImages() {
+        this.preloadAnimation();
+        const AllImagesArr = [
+        'images/ГоловаВверх.png', 'images/ГоловаВниз.png', 'images/ГоловаВлево.png', 'images/ГоловаВправо.png',
+        'images/ГоловаВверхЮ.png', 'images/ГоловаВнизЮ.png', 'images/ГоловаВлевоЮ.png', 'images/ГоловаВправоЮ.png',
+        'images/ТелоВверхВлево.png', 'images/ТелоВверхВправо.png', 'images/ТелоВнизВлево.png', 'images/ТелоВнизВправо.png',
+        'images/ТелоВерхНиз.png', 'images/ТелоВлевоВправо.png', 'images/ТелоВверхВлевоЮ.png', 'images/ТелоВверхВправоЮ.png',
+        'images/ТелоВнизВлевоЮ.png', 'images/ТелоВнизВправоЮ.png', 'images/ТелоВлевоВправоЮ.png', 'images/ТелоВверхВнизЮ.png',
+        'images/ХвостВерх.png', 'images/ХвостНиз.png', 'images/ХвостЛево.png', 'images/ХвостПраво.png',
+        'images/ХвостВверхЮ.png', 'images/ХвостВнизЮ.png', 'images/ХвостВлевоЮ.png', 'images/ХвостВправоЮ.png',
+        'images/ЧервякГоловаВверх.png', 'images/ЧервякГоловаВниз.png', 'images/ЧервякГоловаВлево.png', 'images/ЧервякГоловаВправо.png',
+        'images/ЧервякВверхВлево.png', 'images/ЧервякВверхВправо.png', 'images/ЧервякВнизВлево.png', 'images/ЧервякВнизВправо.png',
+        'images/ЧервякВверхВниз.png', 'images/ЧервякВлевоВправо.png', 'images/ЧервякХвостВверх.png', 'images/ЧервякХвостВниз.png',
+        'images/ЧервякХвостВлево.png', 'images/ЧервякХвостВправо.png', 'images/Яблоко2.png', 'images/Бомба.png',
+        'images/Взрыв.png', 'images/Кубик3.png', 'images/Аптечка.png', 'images/Огонь1.png', 'images/Огонь2.png', 'images/Огонь3.png',
+        'images/Деньги.png', 'images/Цветок1.png', 'images/Цветок2.png', 'images/Цветок3.png', 'images/Яд.png',
+        'images/БашняЛевыйВерх.png', 'images/БашняЛевыйНиз.png', 'images/БашняПравыйВерх.png', 'images/БашняПравыйНиз.png'
+        ];
+         let AlredyLoaded = 0;
+    let AlImages = AllImagesArr.length;
+
+    AllImagesArr.forEach(item => {
+        const img = new Image();
+        img.onload = img.onerror = () => {
+            AlredyLoaded++;
+            if (AlredyLoaded === AlImages) {
+                document.getElementById('preloadScreen').style.display = 'none';
+                this.run();
+            }
+        };
+        img.src = item;
+    });
     }
     control() {
         document.addEventListener('keydown', (e) => { // обрабатываем нажатие на кливиатуре 
@@ -784,10 +843,10 @@ class MamysSkin extends Game {
                            Math.floor(Math.random() * this.FieldMaxY + 1), 
                             Math.floor(Math.random() * this.FlowerImages.length)];      
         
-                } while( JSON.stringify(this.Start) === JSON.stringify([Apples[0], Apples[1]]) ||  
-            this.Apple.some(el => el[0] === Apples[0] && el[1] === Apples[1]) ||      
-            this.Body.some(any => any[0] === Apples[0] && any[1] === Apples[1])       
-        ); 
+           } while(this.Start[0] === Apples[0] && this.Start[1] === Apples[1] ||  
+        this.Apple.some(el => el[0] === Apples[0] && el[1] === Apples[1]) ||      
+        this.Body.some(any => any[0] === Apples[0] && any[1] === Apples[1])       
+        );
             
             this.Apple.push(Apples);
         }
@@ -800,10 +859,10 @@ class MamysSkin extends Game {
                              Math.floor(Math.random() * this.FieldMaxY + 1),
                                 Math.floor(Math.random() * this.FlowerImages.length)];
 
-            } while (JSON.stringify(this.Start) === JSON.stringify([newApple[0], newApple[1]]) ||
+            } while (this.Start[0] === newApple[0] && this.Start[1] === newApple[1] ||
         this.Apple.some(el => el[0] === newApple[0] && el[1] === newApple[1]) ||
         this.Body.some(any => any[0] === newApple[0] && any[1] === newApple[1]) || 
-        this.Bomb.some(any => any[0] === newApple[0] && any[1] === newApple[1]))
+        this.Bomb.some(any => any[0] === newApple[0] && any[1] === newApple[1]));
 
             return newApple;
     }
@@ -978,9 +1037,9 @@ class MamysSkin extends Game {
          
         this.Start = [...this.NewPos]; // мы обрабатывали NewPos для перемещения, теперь приравниваем чтобы голова имела новое значение
 
-        if(this.Body.some(el => // если голова имеет теле координаты что и тело значит мы врезались, это поражение
-            el[0] === this.Start[0] &&
-            el[1] === this.Start[1] 
+        if(this.Body.some(body => // если голова имеет теле координаты что и тело значит мы врезались, это поражение
+            body[0] === this.Start[0] &&
+            body[1] === this.Start[1] 
          ) || this.countBobmActivate === 3) {
             this.lose();
             return;
@@ -992,11 +1051,11 @@ class MamysSkin extends Game {
             const eatenApple = this.Apple.findIndex(apple => 
             apple[0] === this.Start[0] && apple[1] === this.Start[1]);
 
-            const bombActive = this.Bomb.findIndex(any => // проверяем про прошли через бомбу
-            JSON.stringify(any) === JSON.stringify(this.Start));
+            const bombActive = this.Bomb.findIndex(bomb => // проверяем про прошли через бомбу
+            bomb === this.Start);
 
             const eatenMed = this.MedKits.findIndex(med =>  // проверка на аптечку
-            JSON.stringify(med) === JSON.stringify(this.Start));
+            med === this.Start);
 
         
           const oldTailPos = this.Body.length > 0 ? [...this.Body[0]] : null; // если тело больше 0 то старый хвост будет им или не будет
@@ -1037,8 +1096,8 @@ class MamysSkin extends Game {
             }
         }
             this.Body.forEach((segment, index) => { // ищем тело которое пересекает поворот
-            const turn = this.TurnPoints.find(t => 
-                t.pos[0] === segment[0] && t.pos[1] === segment[1]);
+            const turn = this.TurnPoints.find(turn => 
+                turn.pos[0] === segment[0] && turn.pos[1] === segment[1]);
     
             if(turn) { // если нашли то меняем конкретный пройденный через поворот сегмент тела на новое наравление
                 this.bodyDirections[index] = turn.to;
