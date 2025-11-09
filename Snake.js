@@ -1,3 +1,4 @@
+let preloaderWas = false;
 class Game  {
     constructor() {
     this.FieldMaxX = 20; // размер поля по иксам
@@ -43,8 +44,6 @@ class Game  {
     {x: 16, y: 14}, {x: 16, y: 15},
     {x: 14, y: 16}, {x: 15, y: 16}, {x: 16, y: 16}
     ];
-
-   this.preloadImages(); // загрузка изображений 
     }
 
     start() { // генерация головы на поле 
@@ -428,7 +427,7 @@ class Game  {
         this.tail = [] // массив для хвоста
         this.TurnPoints = []
         this.snakeDead = false;
-        this.run(); // снова запускаем игру
+        this.preloadImages(); // снова запускаем игру
     }
     movement() { // обработка нажатия клавишь для движения
         if(this.count === 240) {
@@ -583,46 +582,36 @@ class Game  {
         
             this.animation(); // вызываем отрисовку  
     }
-    preloadAnimation() {
-       let currentShot = 0;
-       setInterval(() => {
+    preloadAnimtion() {
+        let currentShot = 0;
+     setInterval(() => {
         currentShot = (currentShot + 1) % this.failsWithImages().otherObjects.preloadAnimationImages.length;
        document.getElementById('preloadAnimation').src = this.failsWithImages().otherObjects.preloadAnimationImages[currentShot];
         },400);
-    
     }
     preloadImages() {
-        this.preloadAnimation();
-        const AllImagesArr = [
-        'images/ГоловаВверх.png', 'images/ГоловаВниз.png', 'images/ГоловаВлево.png', 'images/ГоловаВправо.png',
-        'images/ГоловаВверхЮ.png', 'images/ГоловаВнизЮ.png', 'images/ГоловаВлевоЮ.png', 'images/ГоловаВправоЮ.png',
-        'images/ТелоВверхВлево.png', 'images/ТелоВверхВправо.png', 'images/ТелоВнизВлево.png', 'images/ТелоВнизВправо.png',
-        'images/ТелоВерхНиз.png', 'images/ТелоВлевоВправо.png', 'images/ТелоВверхВлевоЮ.png', 'images/ТелоВверхВправоЮ.png',
-        'images/ТелоВнизВлевоЮ.png', 'images/ТелоВнизВправоЮ.png', 'images/ТелоВлевоВправоЮ.png', 'images/ТелоВверхВнизЮ.png',
-        'images/ХвостВерх.png', 'images/ХвостНиз.png', 'images/ХвостЛево.png', 'images/ХвостПраво.png',
-        'images/ХвостВверхЮ.png', 'images/ХвостВнизЮ.png', 'images/ХвостВлевоЮ.png', 'images/ХвостВправоЮ.png',
-        'images/ЧервякГоловаВверх.png', 'images/ЧервякГоловаВниз.png', 'images/ЧервякГоловаВлево.png', 'images/ЧервякГоловаВправо.png',
-        'images/ЧервякВверхВлево.png', 'images/ЧервякВверхВправо.png', 'images/ЧервякВнизВлево.png', 'images/ЧервякВнизВправо.png',
-        'images/ЧервякВверхВниз.png', 'images/ЧервякВлевоВправо.png', 'images/ЧервякХвостВверх.png', 'images/ЧервякХвостВниз.png',
-        'images/ЧервякХвостВлево.png', 'images/ЧервякХвостВправо.png', 'images/Яблоко2.png', 'images/Бомба.png',
-        'images/Взрыв.png', 'images/Кубик3.png', 'images/Аптечка.png', 'images/Огонь1.png', 'images/Огонь2.png', 'images/Огонь3.png',
-        'images/Деньги.png', 'images/Цветок1.png', 'images/Цветок2.png', 'images/Цветок3.png', 'images/Яд.png',
-        'images/БашняЛевыйВерх.png', 'images/БашняЛевыйНиз.png', 'images/БашняПравыйВерх.png', 'images/БашняПравыйНиз.png'
-        ];
-         let AlredyLoaded = 0;
-    let AlImages = AllImagesArr.length;
+        if(!preloaderWas) {
+    this.preloadAnimtion()
+    setTimeout(() => {
+            const preloadScreen = document.getElementById('preloadScreen');
+            
+            preloadScreen.style.transition = 'opacity 0.5s ease-in-out';
+            preloadScreen.style.opacity = '0';
+            
+            preloaderWas = true;
 
-    AllImagesArr.forEach(item => {
-        const img = new Image();
-        img.onload = img.onerror = () => {
-            AlredyLoaded++;
-            if (AlredyLoaded === AlImages) {
-                document.getElementById('preloadScreen').style.display = 'none';
-                this.run();
-            }
-        };
-        img.src = item;
-    });
+            setTimeout(() => {
+                preloadScreen.style.display = 'none';
+            }, 500);
+        
+    }, 6000);
+    this.run(); 
+} else {
+    document.getElementById('preloadScreen').style.display = 'none';
+    this.run();
+}
+
+
     }
     control() {
         document.addEventListener('keydown', (e) => { // обрабатываем нажатие на кливиатуре 
@@ -968,7 +957,7 @@ class MamysSkin extends Game {
         this.tail = [] // массив для хвоста
         this.TurnPoints = []
         this.snakeDead = false;
-        this.run(); // снова запускаем игру
+        this.preloadImages(); // снова запускаем игру
     }
      movement() { // обработка нажатия клавишь для движения
         if(this.count === 240) {
@@ -1135,7 +1124,7 @@ const GameStart = { // класс для смены классов
             case 'Mamys':
                 this.chooseSnake = new MamysSkin();
         }
-        this.chooseSnake.run() // запускаем игру с определенным классом 
+        this.chooseSnake.preloadImages() // запускаем игру с определенным классом 
         
     },
     GlobalRestart() { // вызывает рестарт для своего класса
