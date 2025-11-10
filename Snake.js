@@ -1316,7 +1316,8 @@ class MamysSkin extends Game {
         } else if (trueMed) {
           row += `<img src="${images.MedKit}"class="medkit" width="25" height="25">`;
         } else {
-          row += `<div style="display:inline-block; width:25px; height:25px; background:transparent;"></div>`; // отрисовка поля если ничего не найдено
+          row += `<div style="display:inline-block; width:25px; height:25px; background:transparent; margin:0;
+           padding:0; border:none; vertical-align:top; line-height:0; font-size:0;"></div>`; // отрисовка поля если ничего не найдено
         }
       }
       field += row + "\n";
@@ -1354,6 +1355,9 @@ class MamysSkin extends Game {
     clearInterval(this.SpeedLimit); // сбрасываем все накопившиеся за время игры условия
     if (this.fieldAnimationInterval) {
       clearInterval(this.fieldAnimationInterval);
+    }
+    if (this.FieldAnimationInterval) {
+      clearInterval(this.FieldAnimationInterval);
     }
     this.Speed = 350; // тут
     this.Start = []; // тут
