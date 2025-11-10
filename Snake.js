@@ -27,6 +27,7 @@ class Game {
     this.TurnPoints = []; // массив для хранения координат точки поворота
     this.snakeDead = false;
     this.currentFireAnimation = 0;
+    this.fieldAnimationInterval = 0;
     this.walls = [
       // Левый верхний угол
       { x: 4, y: 4 },
@@ -258,6 +259,12 @@ class Game {
           "images/Картинка3.png",
           "images/Картинка2.png",
         ],
+        fieldAnimationImages: [
+          "images/Поле1.png",
+          "images/Поле2.png",
+          "images/Поле3.png",
+          "images/Поле4.png",
+        ],
       },
     };
     return directionFromTo;
@@ -442,7 +449,8 @@ class Game {
         } else if (trueMed) {
           row += `<img src="${images.MedKit}"class="medkit" width="25" height="25">`;
         } else {
-          row += `<img src="${images.fieldBlock}" width="25" height="25">`; // отрисовка поля если ничего не найдено
+          row += `<div style="display:inline-block; width:25px; height:25px; background:transparent; margin:0;
+           padding:0; border:none; vertical-align:top; line-height:0; font-size:0;"></div>`; // отрисовка поля если ничего не найдено
         }
       }
       field += row + "\n";
@@ -525,7 +533,15 @@ class Game {
     document.getElementById("ButtonDefaultSkin").style.display = "none";
     document.getElementById("ButtonYulyaSkin").style.display = "none";
     document.getElementById("ButtonMamysSkin").style.display = "none";
+    const princessField = document.getElementById("FieldAnimation");
+    const defaultField = document.getElementById("fieldAnimation");
+
+    if (princessField) princessField.style.display = "none";
+    if (defaultField) defaultField.style.display = "block";
     clearInterval(this.SpeedLimit); // сбрасываем все накопившиеся за время игры условия
+    if (this.fieldAnimationInterval) {
+      clearInterval(this.fieldAnimationInterval);
+    }
     this.Speed = 250; // тут
     this.Start = []; // тут
     this.Body = []; // тут
@@ -539,6 +555,7 @@ class Game {
     this.tail = []; // массив для хвоста
     this.TurnPoints = [];
     this.snakeDead = false;
+    this.fieldAnimation();
     this.preloadImages(); // снова запускаем игру
   }
   movement() {
@@ -707,7 +724,20 @@ class Game {
 
     this.animation(); // вызываем отрисовку
   }
+  fieldAnimation() {
+    let currentShot = 0;
+    this.fieldAnimationInterval = setInterval(() => {
+      currentShot =
+        (currentShot + 1) %
+        this.failsWithImages().otherObjects.fieldAnimationImages.length;
+      document.getElementById("fieldAnimation").src =
+        this.failsWithImages().otherObjects.fieldAnimationImages[currentShot];
+    }, 350);
+  }
   preloadAnimtion() {
+    if (this.fieldAnimationInterval) {
+      clearInterval(this.fieldAnimationInterval);
+    }
     let currentShot = 0;
     setInterval(() => {
       currentShot =
@@ -781,6 +811,14 @@ class Game {
         "images/БашняЛевыйНиз.png",
         "images/БашняПравыйВерх.png",
         "images/БашняПравыйНиз.png",
+        "images/Поле1.png",
+        "images/Поле2.png",
+        "images/Поле3.png",
+        "images/Поле4.png",
+        "images/Море1.png",
+        "images/Море2.png",
+        "images/Море3.png",
+        "images/Море4.png",
       ];
       let onloadImagesCount = 0;
       let gameStart = false;
@@ -851,6 +889,7 @@ class Game {
     this.MedKitSpawn(); // спавн аптечек
     this.FireAnimation();
     this.animation(); // рисуем их
+    this.fieldAnimation();
     this.control();
     this.SpeedLimit = setInterval(() => {
       this.movement();
@@ -887,6 +926,7 @@ class PrincessSkin extends Game {
       { x: 14, y: 4 },
       { x: 15, y: 4 }, // 6 7
     ];
+    this.FieldAnimationInterval = 0;
   }
   failsWithImages() {
     // это обьект для хранения изображений
@@ -923,6 +963,12 @@ class PrincessSkin extends Game {
           RightDown: "images/БашняПравыйНиз.png",
           RightUp: "images/БашняПравыйВерх.png",
         },
+        FieldAnimationImages: [
+          "images/Море1.png",
+          "images/Море2.png",
+          "images/Море3.png",
+          "images/Море4.png",
+        ],
       },
     };
     return directionFromTo;
@@ -1033,13 +1079,76 @@ class PrincessSkin extends Game {
         } else if (trueMed) {
           row += `<img src="${images.MedKit}"class="medkit" width="25" height="25">`;
         } else {
-          row += `<img src="${images.fieldBlock}" width="25" height="25">`; // отрисовка поля если ничего не найдено
+          row += `<div style="display:inline-block; width:25px; height:25px; background:transparent; margin:0;
+           padding:0; border:none; vertical-align:top; line-height:0; font-size:0;"></div>`; // отрисовка поля если ничего не найдено
         }
       }
       field += row + "\n";
     }
     document.getElementById("Web").innerHTML = field;
     document.getElementById("Score").textContent = `SCORE: ${this.count}`;
+  }
+  restartButton() {
+    document.getElementById("Heart3").style.display = "flex"; // по умолчанию сердечки показываются на экране по этому "flex"
+    document.getElementById("Heart2").style.display = "flex";
+    document.getElementById("Heart1").style.display = "flex";
+    document.getElementById("Lose").style.display = "none"; // после рестарты скрываем
+    document.getElementById("Win").style.display = "none"; // так же скрываем
+    document.getElementById("restart").style.display = "none"; // опять же, скрываем
+    document.getElementById("SelectButton").style.display = "none";
+    document.getElementById("ButtonDefaultSkin").style.display = "none";
+    document.getElementById("ButtonYulyaSkin").style.display = "none";
+    document.getElementById("ButtonMamysSkin").style.display = "none";
+    clearInterval(this.SpeedLimit); // сбрасываем все накопившиеся за время игры условия
+    if (this.fieldAnimationInterval) {
+      clearInterval(this.fieldAnimationInterval);
+    }
+    if (this.FieldAnimationInterval) {
+      clearInterval(this.FieldAnimationInterval);
+    }
+    this.Speed = 250; // тут
+    this.Start = []; // тут
+    this.Body = []; // тут
+    this.TurnPoints = []; // тут
+    this.count = 0; // и тут
+    this.countBobmActivate = 0; // тут тоже
+    this.tailDirection = "right"; // изначально хвост смотрит туда же куда и голова
+    (this.bodyDirections = []), // массив для направления тела
+      (this.oldDirection = "right"); // старое направление
+    this.newDirection = "right"; // новое направление
+    this.tail = []; // массив для хвоста
+    this.TurnPoints = [];
+    this.snakeDead = false;
+    this.FieldAnimation();
+    this.preloadImages(); // снова запускаем игру
+  }
+  FieldAnimation() {
+    if (this.FieldAnimationInterval) {
+      clearInterval(this.FieldAnimationInterval);
+    }
+
+    let currentShot = 0;
+    this.FieldAnimationInterval = setInterval(() => {
+      currentShot =
+        (currentShot + 1) %
+        this.failsWithImages().otherObjects.FieldAnimationImages.length;
+      document.getElementById("FieldAnimation").src =
+        this.failsWithImages().otherObjects.FieldAnimationImages[currentShot];
+    }, 350);
+  }
+  run() {
+    // запуск последовательно всех функций для отрисовки
+    this.start(); // сгенерировали голову
+    this.apple(); // сгенерировали яблоки
+    this.bombGeneration(); // генерируем бомбы
+    this.MedKitSpawn(); // спавн аптечек
+    this.FireAnimation();
+    this.animation(); // рисуем их
+    this.FieldAnimation();
+    this.control();
+    this.SpeedLimit = setInterval(() => {
+      this.movement();
+    }, this.Speed);
   }
 }
 
@@ -1207,7 +1316,7 @@ class MamysSkin extends Game {
         } else if (trueMed) {
           row += `<img src="${images.MedKit}"class="medkit" width="25" height="25">`;
         } else {
-          row += `<img src="${images.fieldBlock}" width="25" height="25">`; // отрисовка поля если ничего не найдено
+          row += `<div style="display:inline-block; width:25px; height:25px; background:transparent;"></div>`; // отрисовка поля если ничего не найдено
         }
       }
       field += row + "\n";
@@ -1243,6 +1352,9 @@ class MamysSkin extends Game {
     document.getElementById("ButtonYulyaSkin").style.display = "none";
     document.getElementById("ButtonMamysSkin").style.display = "none";
     clearInterval(this.SpeedLimit); // сбрасываем все накопившиеся за время игры условия
+    if (this.fieldAnimationInterval) {
+      clearInterval(this.fieldAnimationInterval);
+    }
     this.Speed = 350; // тут
     this.Start = []; // тут
     this.Body = []; // тут
@@ -1429,7 +1541,9 @@ const GameStart = {
         this.chooseSnake = new Game(); // основная змея
         break;
       case "Yulya":
-        this.chooseSnake = new PrincessSkin(); // кастомная змея
+        this.chooseSnake = new PrincessSkin();
+        document.getElementById("FieldAnimation").style.display = "block";
+        document.getElementById("fieldAnimation").style.display = "none";
         break;
       case "Mamys":
         this.chooseSnake = new MamysSkin();
