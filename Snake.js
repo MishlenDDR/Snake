@@ -17,7 +17,7 @@ class Game {
     this.count = 0; // счетчик сьеденных яблок
     this.countBobmActivate = 0; // счетчик сьеденных бомб
     this.SpeedLimit = 0; // просто переменная для обработки скорости
-    this.Speed = 250; // начальная скорость движения
+    this.Speed = 260; // начальная скорость движения
     this.oldHead = []; // массив для старого положения головы
     this.tailDirection = "right"; // изначально хвост смотрит туда же куда и голова
     this.bodyDirections = []; // массив для направления тела
@@ -212,6 +212,17 @@ class Game {
       this.currentFireAnimation = (this.currentFireAnimation + 1) % 3;
     }, 50);
   }
+  pickSoundForAnyGameMechanics(WhichSound) {
+    const soundPlay = new Audio(`sound/${WhichSound}.mp3`)
+    soundPlay.volume = 0.05;
+      soundPlay.play().catch(() => {});
+  }
+  playBackgroundMusic() { 
+        this.backgroundAudio = new Audio('sound/SoundTrack.mp3');
+        this.backgroundAudio.volume = 0.008;
+        this.backgroundAudio.loop = true;
+        this.backgroundAudio.play().catch(() => {});
+      }
 
   failsWithImages() {
     // это обьект для хранения изображений
@@ -464,15 +475,15 @@ class Game {
   }
   speendChange() {
     // изменение скорости в зависимости от количества сьеденных яблок
-    if (this.count === 50) {
+    if (this.count === 150) {
       clearInterval(this.SpeedLimit);
-      this.Speed = 150;
+      this.Speed = 250;
       this.SpeedLimit = setInterval(() => {
         this.movement();
       }, this.Speed);
-    } else if (this.count === 150) {
+    } else if (this.count === 300) {
       clearInterval(this.SpeedLimit);
-      this.Speed = 80;
+      this.Speed = 235;
       this.SpeedLimit = setInterval(() => {
         this.movement();
       }, this.Speed);
@@ -485,8 +496,10 @@ class Game {
     document.getElementById("ButtonDefaultSkin").style.display = "flex";
     document.getElementById("ButtonYulyaSkin").style.display = "flex";
     document.getElementById("ButtonMamysSkin").style.display = "flex";
+  //  document.getElementById('soundOffOn').style.display = 'flex';
   }
   lose() {
+    this.pickSoundForAnyGameMechanics('lose');
     this.snakeDead = true;
     clearInterval(this.SpeedLimit);
     document.getElementById("Lose").style.display = "flex"; // показываем кнопку поражения
@@ -495,6 +508,7 @@ class Game {
     document.getElementById("ButtonDefaultSkin").style.display = "flex";
     document.getElementById("ButtonYulyaSkin").style.display = "flex";
     document.getElementById("ButtonMamysSkin").style.display = "flex";
+   // document.getElementById('soundOffOn').style.display = 'flex';
     this.animation(); // для отрисовки взрыва вызываем обновленные сведение про голову
   }
   bombActiveAnimation() {
@@ -537,6 +551,7 @@ class Game {
     document.getElementById("ButtonDefaultSkin").style.display = "none";
     document.getElementById("ButtonYulyaSkin").style.display = "none";
     document.getElementById("ButtonMamysSkin").style.display = "none";
+   // document.getElementById('soundOffOn').style.display = 'none';
     clearInterval(this.SpeedLimit); // сбрасываем все накопившиеся за время игры условия
     this.Speed = 250; // тут
     this.Start = []; // тут
@@ -554,7 +569,7 @@ class Game {
   }
   movement() {
     // обработка нажатия клавишь для движения
-    if (this.count === 240) {
+    if (this.count === 400) {
       this.win();
       return;
     }
@@ -649,11 +664,11 @@ class Game {
 
     const oldTailPos = this.Body.length > 0 ? [...this.Body[0]] : null; // если тело больше 0 то старый хвост будет им или не будет
     if (eatenApple !== -1) {
-      // если сьели яблоко
       this.Apple.splice(eatenApple, 1); // в массиве яблок удаляем одно последнее
       this.Apple.push(this.addApple()); // и добавляем сразу же еще одно случайное
       this.speendChange(); // вызываем для проверки, чтобы каждый раз проверяло условие
       this.count += 10; // добавляем единицу к счетчику сьеденных яблок
+      this.pickSoundForAnyGameMechanics('apple');
     } else {
       this.Body.shift(); // если не сьели то удаляем первый элемент тела, то есть хвост
       this.bodyDirections.shift();
@@ -706,6 +721,7 @@ class Game {
       this.Bomb.push(...this.addBombs());
       this.countBobmActivate++;
       this.bombActiveAnimation();
+      this.pickSoundForAnyGameMechanics('bomb');
     }
     if (eatenMed !== -1) {
       this.MedKits.splice(eatenMed, 1);
@@ -745,6 +761,7 @@ class Game {
   preloadImages() {
     if (!preloaderWas) {
       this.preloadAnimtion();
+      this.playBackgroundMusic();
       const imagePreload = [
         "images/ГоловаВверх.png",
         "images/ГоловаВниз.png",
@@ -813,6 +830,10 @@ class Game {
         "images/Море2.png",
         "images/Море3.png",
         "images/Море4.png",
+        "sound/apple.mp3",
+        "sound/bomb.mp3",
+        "sound/lose.mp3",
+        "sound/SoundTrack.mp3",
       ];
       let onloadImagesCount = 0;
       let gameStart = false;
@@ -1528,11 +1549,18 @@ const GameStart = {
     }
     this.chooseSnake.preloadImages(); // запускаем игру с определенным классом
   },
+ /* soundButtonClass() {
+    if(this.chooseSnake) {
+      this.chooseSnake.stopSoundsButton();
+    }
+  },
+  */
   GlobalRestart() {
     // вызывает рестарт для своего класса
     if (this.chooseSnake) {
       this.chooseSnake.restartButton();
     }
+  
   },
 };
 
