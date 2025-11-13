@@ -1,4 +1,7 @@
 let preloaderWas = false;
+const gameMusic = new Audio('sound/SoundTrack.mp3');
+gameMusic.volume = 0.004;
+gameMusic.loop = true;
 class Game {
   constructor() {
     this.FieldMaxX = 20; // размер поля по иксам
@@ -29,6 +32,7 @@ class Game {
     this.currentFireAnimation = 0;
     this.fireAnimationInterval = 0;
     this.fieldAnimationInterval = null;
+    this.backgroundAudio = gameMusic;
     this.walls = [
       // Левый верхний угол
       { x: 4, y: 4 },
@@ -214,15 +218,22 @@ class Game {
   }
   pickSoundForAnyGameMechanics(WhichSound) {
     const soundPlay = new Audio(`sound/${WhichSound}.mp3`)
-    soundPlay.volume = 0.05;
+    soundPlay.volume = 0.03;
       soundPlay.play().catch(() => {});
   }
-  playBackgroundMusic() { 
-        this.backgroundAudio = new Audio('sound/SoundTrack.mp3');
-        this.backgroundAudio.volume = 0.008;
-        this.backgroundAudio.loop = true;
-        this.backgroundAudio.play().catch(() => {});
-      }
+  stopSoundsButton() {
+    const soundButton = document.getElementById('soundOffOn');
+    const soundImage = soundButton.querySelector('img');
+    
+    // Управляем глобальной музыкой
+    if (gameMusic.volume > 0) {
+      gameMusic.volume = 0;
+      soundImage.src = "images/КнопкиВкл1.png";
+    } else {
+      gameMusic.volume = 0.004;
+      soundImage.src = "images/КнопкиВкл2.png";
+    }
+  }
 
   failsWithImages() {
     // это обьект для хранения изображений
@@ -395,7 +406,7 @@ class Game {
 
   animation() {
     // отрисовка элементов
-    console.clear(); // очищаем консоль для оптимизации
+   // console.clear(); // очищаем консоль для оптимизации
     let field = ""; // строки поля изначально пустые
 
     const headImages = this.findTurnHead(); // передаем картинки головы
@@ -496,7 +507,7 @@ class Game {
     document.getElementById("ButtonDefaultSkin").style.display = "flex";
     document.getElementById("ButtonYulyaSkin").style.display = "flex";
     document.getElementById("ButtonMamysSkin").style.display = "flex";
-  //  document.getElementById('soundOffOn').style.display = 'flex';
+   document.getElementById('soundOffOn').style.display = 'flex';
   }
   lose() {
     this.pickSoundForAnyGameMechanics('lose');
@@ -508,7 +519,7 @@ class Game {
     document.getElementById("ButtonDefaultSkin").style.display = "flex";
     document.getElementById("ButtonYulyaSkin").style.display = "flex";
     document.getElementById("ButtonMamysSkin").style.display = "flex";
-   // document.getElementById('soundOffOn').style.display = 'flex';
+    document.getElementById('soundOffOn').style.display = 'flex';
     this.animation(); // для отрисовки взрыва вызываем обновленные сведение про голову
   }
   bombActiveAnimation() {
@@ -551,7 +562,7 @@ class Game {
     document.getElementById("ButtonDefaultSkin").style.display = "none";
     document.getElementById("ButtonYulyaSkin").style.display = "none";
     document.getElementById("ButtonMamysSkin").style.display = "none";
-   // document.getElementById('soundOffOn').style.display = 'none';
+    document.getElementById('soundOffOn').style.display = 'none';
     clearInterval(this.SpeedLimit); // сбрасываем все накопившиеся за время игры условия
     this.Speed = 250; // тут
     this.Start = []; // тут
@@ -761,7 +772,6 @@ class Game {
   preloadImages() {
     if (!preloaderWas) {
       this.preloadAnimtion();
-      this.playBackgroundMusic();
       const imagePreload = [
         "images/ГоловаВверх.png",
         "images/ГоловаВниз.png",
@@ -878,6 +888,7 @@ class Game {
     }
   }
   control() {
+    let GameStart = true;
     document.addEventListener("keydown", (e) => {
       // обрабатываем нажатие на кливиатуре
       switch (e.key) {
@@ -894,8 +905,12 @@ class Game {
           this.direction = "d";
           break;
       }
+      if(GameStart) {
+            GameStart = false;
+            gameMusic.play().catch(() => {});
+        }
     });
-  }
+}
   run() {
     // запуск последовательно всех функций для отрисовки
     this.start(); // сгенерировали голову
@@ -941,6 +956,7 @@ class PrincessSkin extends Game {
       { x: 14, y: 4 },
       { x: 15, y: 4 }, // 6 7
     ];
+    this.backgroundAudio = null;
   }
   failsWithImages() {
     // это обьект для хранения изображений
@@ -1113,6 +1129,7 @@ class PrincessSkin extends Game {
     document.getElementById("ButtonDefaultSkin").style.display = "none";
     document.getElementById("ButtonYulyaSkin").style.display = "none";
     document.getElementById("ButtonMamysSkin").style.display = "none";
+    document.getElementById('soundOffOn').style.display = 'none';
     clearInterval(this.SpeedLimit); // сбрасываем все накопившиеся за время игры услови
     this.Speed = 250; // тут
     this.Start = []; // тут
@@ -1156,6 +1173,7 @@ class MamysSkin extends Game {
     this.Speed = 350;
     this.NumberOfApples = 20;
     this.fieldAnimationInterval = null;
+    this.backgroundAudio = null;
   }
   failsWithImages() {
     // это обьект для хранения изображений
@@ -1352,6 +1370,7 @@ class MamysSkin extends Game {
     document.getElementById("ButtonDefaultSkin").style.display = "none";
     document.getElementById("ButtonYulyaSkin").style.display = "none";
     document.getElementById("ButtonMamysSkin").style.display = "none";
+    document.getElementById('soundOffOn').style.display = 'none';
     clearInterval(this.SpeedLimit); // сбрасываем все накопившиеся за время игры условия
     this.Speed = 350; // тут
     this.Start = []; // тут
@@ -1462,6 +1481,7 @@ class MamysSkin extends Game {
       this.Apple.push(this.addApple()); // и добавляем сразу же еще одно случайное
       this.speendChange(); // вызываем для проверки, чтобы каждый раз проверяло условие
       this.count += 10; // добавляем единицу к счетчику сьеденных яблок
+      this.pickSoundForAnyGameMechanics('apple');
     } else {
       this.Body.shift(); // если не сьели то удаляем первый элемент тела, то есть хвост
       this.bodyDirections.shift();
@@ -1514,6 +1534,7 @@ class MamysSkin extends Game {
       this.Bomb.push(...this.addBombs());
       this.countBobmActivate++;
       this.bombActiveAnimation();
+      this.pickSoundForAnyGameMechanics('bomb');
     }
     if (eatenMed !== -1) {
       this.MedKits.splice(eatenMed, 1);
@@ -1530,7 +1551,7 @@ const GameStart = {
 
   SelectSnakes(type) {
     // получаем в эту функцию параметр из html файла в зависимости от кнопки которую нажали
-
+    
     if (this.chooseSnake) {
       // пока не нажали кнопку скорость 0, значит стоим на месте
       clearInterval(this.chooseSnake.SpeedLimit);
@@ -1547,16 +1568,16 @@ const GameStart = {
       case "Mamys":
         this.chooseSnake = new MamysSkin();
     }
+    this.chooseSnake.backgroundAudio = gameMusic;
     this.chooseSnake.preloadImages(); // запускаем игру с определенным классом
   },
- /* soundButtonClass() {
+  soundButtonClass() {
     if(this.chooseSnake) {
-      this.chooseSnake.stopSoundsButton();
+    this.chooseSnake.stopSoundsButton();
     }
   },
-  */
+
   GlobalRestart() {
-    // вызывает рестарт для своего класса
     if (this.chooseSnake) {
       this.chooseSnake.restartButton();
     }
