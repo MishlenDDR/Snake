@@ -11,11 +11,12 @@ class Game {
     this.Body = []; // массив для тела
     this.NewPos = []; // массив для изменения позиции головы
     this.Apple = []; // массив для хранения яблок
+    this.MedKits = []; // хилл
+    this.LightningArr = []; // молния
     this.NumberOfBombs = 10;
     this.NumberOfApples = 10;
     this.NumberOfMedKits = 3;
     this.Bomb = []; // массив с бомбами
-    this.MedKits = []; // хилл
     this.direction = "right"; // при старте изначальное направление вправо
     this.count = 0; // счетчик сьеденных яблок
     this.countBobmActivate = 0; // счетчик сьеденных бомб
@@ -32,6 +33,13 @@ class Game {
     this.currentFireAnimation = 0;
     this.fireAnimationInterval = 0;
     this.fieldAnimationInterval = null;
+    this.lightningAnimationInterval = null;
+    this.LightningWarningInterval = null;
+    this.ElectricInterval = null;
+    this.calllightningAnimationInterval = null;
+    this.StopLightningInterval = null;
+    this.LightningActive = false;
+    this.WarningActive = false;
     this.backgroundAudio = gameMusic;
     this.walls = [
       // Левый верхний угол
@@ -208,6 +216,118 @@ class Game {
     }
     return this.MedKits;
   }
+  lightningSpawn() {
+    this.LightningArr = [];
+    for(let i = 0; i < 4; i++) {
+      let lightning;
+      do{
+        lightning = [Math.floor(Math.random() *  this.FieldMaxX + 1),
+                      Math.floor(Math.random() * this.FieldMaxY + 1),
+                    ]
+      } while (
+        (this.Start[0] === lightning[0] && this.Start[1] === lightning[1]) || // проверка головы
+        this.Bomb.some((bomb) => bomb[0] === lightning[0] && bomb[1] === lightning[1]) || // проверка бомб
+        this.Body.some((body) => body[0] === lightning[0] && body[1] === lightning[1]) || // проверка тела
+        this.Apple.some((apple) => apple[0] === lightning[0] && apple[1] === lightning[1]) || // проверка яблок
+        this.walls.some((wall) => wall.x === lightning[0] && wall.y === lightning[1])
+      )
+      this.LightningArr.push(lightning)
+    }
+    return  this.LightningArr;
+  }
+  warningAboutLightning() {
+    this.lightningSpawn();
+      document.querySelectorAll('.lightningAnimation').forEach(item => {
+        item.style.display = 'none';
+    });
+    this.WarningActive = true;
+       this.LightningArr.forEach((lightning, index) => {
+      const lightningWarning = document.getElementById(`lightningWarning${index + 1}`);
+    lightningWarning.style.display = 'block';
+    lightningWarning.style.position = 'absolute';
+    lightningWarning.style.left = `${lightning[0] * 25}px`; 
+    lightningWarning.style.top = `${lightning[1] * 25}px`;
+    lightningWarning.style.zIndex = '3';
+    
+    
+     })
+    if (this.LightningWarningInterval) {
+      clearInterval(this.LightningWarningInterval);
+    }
+    let currentShot = 0;
+   this.LightningWarningInterval = setInterval(() => {
+      currentShot =
+        (currentShot + 1) %
+        this.failsWithImages().otherObjects.lightningWarningImages.length;
+     const currentImage = this.failsWithImages().otherObjects.lightningWarningImages[currentShot];
+
+         document.querySelectorAll('.Warning').forEach(item => {
+            item.src = currentImage;
+             });
+    }, 190);
+    if (this.calllightningAnimationInterval) {
+        clearTimeout(this.calllightningAnimationInterval);
+    }
+    this.calllightningAnimationInterval = setTimeout(() => {
+        if (this.LightningWarningInterval) {
+            clearInterval(this.LightningWarningInterval);
+        }
+        // Скрываем предупреждения
+        document.querySelectorAll('.Warning').forEach(el => {
+            el.style.display = 'none';
+        });
+        this.WarningActive = false;
+        this.lightningAnimation();
+    }, 3000);
+  }
+   lightningAnimation() {
+   
+  document.querySelectorAll('.Warning').forEach(item => {
+        item.style.display = 'none';
+    });
+    this.LightningActive = true;
+     this.LightningArr.forEach((lightning, index) => {
+      const lightningElement = document.getElementById(`lightningAnimation${index + 1}`);
+    lightningElement.style.display = 'block';
+    lightningElement.style.position = 'absolute';
+    lightningElement.style.left = `${lightning[0] * 25}px`; 
+    lightningElement.style.top = `${(lightning[1] - 4.4) * 26}px`;
+    lightningElement.style.zIndex = '3';
+    
+    
+     })
+    if (this.lightningAnimationInterval) {
+      clearInterval(this.lightningAnimationInterval);
+    }
+    let currentShot = 0;
+    this.lightningAnimationInterval = setInterval(() => {
+      currentShot =
+        (currentShot + 1) %
+        this.failsWithImages().otherObjects.lightningAnimationImages.length;
+     const currentImage = this.failsWithImages().otherObjects.lightningAnimationImages[currentShot];
+
+         document.querySelectorAll('.lightningAnimation').forEach(item => {
+            item.src = currentImage;
+             });
+    }, 70);
+          if (this.StopLightningInterval) {
+        clearTimeout(this.StopLightningInterval);
+    }
+    this.StopLightningInterval = setTimeout(() => {
+        if (this.lightningAnimationInterval) {
+            clearInterval(this.lightningAnimationInterval);
+        }
+        // Скрываем молнии
+        document.querySelectorAll('.lightningAnimation').forEach(item => {
+            item.style.display = 'none';
+        });
+        this.LightningActive = false;
+        
+        setTimeout(() => {
+            this.warningAboutLightning();
+        }, 6000);
+    }, 2500);
+  }
   FireAnimation() {
     if (this.fireAnimationInterval) {
       clearInterval(this.fireAnimationInterval);
@@ -291,6 +411,17 @@ class Game {
           "images/Поле3.png",
           "images/Поле4.png",
         ],
+        lightningAnimationImages: [
+          "images/Молния1.png",
+          "images/Молния2.png",
+          "images/Молния3.png",
+          "images/Молния4.png",
+          "images/Молния5.png",
+        ],
+        lightningWarningImages: [
+          "images/Предупреждение1.png",
+          "images/Предупреждение2.png",
+        ]
       },
     };
     return directionFromTo;
@@ -564,10 +695,11 @@ class Game {
     document.getElementById("ButtonMamysSkin").style.display = "none";
     document.getElementById('soundOffOn').style.display = 'none';
     clearInterval(this.SpeedLimit); // сбрасываем все накопившиеся за время игры условия
-    this.Speed = 250; // тут
+    this.Speed = 260; // тут
     this.Start = []; // тут
     this.Body = []; // тут
     this.TurnPoints = []; // тут
+    this.LightningArr = [];
     this.count = 0; // и тут
     this.countBobmActivate = 0; // тут тоже
     this.tailDirection = "right"; // изначально хвост смотрит туда же куда и голова
@@ -576,7 +708,10 @@ class Game {
     this.newDirection = "right"; // новое направление
     this.tail = []; // массив для хвоста
     this.snakeDead = false;
-    this.preloadImages(); // снова запускаем игру
+    if(this.calllightningAnimationInterval) {
+      clearInterval(this.calllightningAnimationInterval)
+    }
+    this.preloadImages();
   }
   movement() {
     // обработка нажатия клавишь для движения
@@ -672,6 +807,11 @@ class Game {
     const WallActive = this.walls.findIndex(
       (wall) => wall.x === this.Start[0] && wall.y === this.Start[1]
     );
+    
+    const LightningHit = this.LightningArr.findIndex(
+      (light) => light[0] === this.Start[0] && light[1] === this.Start[1]
+    );
+
 
     const oldTailPos = this.Body.length > 0 ? [...this.Body[0]] : null; // если тело больше 0 то старый хвост будет им или не будет
     if (eatenApple !== -1) {
@@ -740,6 +880,10 @@ class Game {
     }
     if (WallActive !== -1) {
       this.lose();
+      return;
+    }
+    if(LightningHit !== -1 && !this.WarningActive && this.LightningActive) {
+      this.lose()
       return;
     }
 
@@ -840,6 +984,11 @@ class Game {
         "images/Море2.png",
         "images/Море3.png",
         "images/Море4.png",
+        "images/Молния1.png",
+        "images/Молния2.png",
+        "images/Молния3.png",
+        "images/Молния4.png",
+        "images/Молния5.png",
         "sound/apple.mp3",
         "sound/bomb.mp3",
         "sound/lose.mp3",
@@ -867,7 +1016,7 @@ class Game {
           setTimeout(() => {
             preloadScreen.style.display = "none";
           }, 500);
-          this.run();
+          this.run()
         }
       };
 
@@ -905,14 +1054,18 @@ class Game {
           this.direction = "d";
           break;
       }
+     
       if(GameStart) {
             GameStart = false;
             gameMusic.play().catch(() => {});
+            this.warningAboutLightning();
+
         }
     });
 }
   run() {
     // запуск последовательно всех функций для отрисовки
+   
     this.start(); // сгенерировали голову
     this.apple(); // сгенерировали яблоки
     this.bombGeneration(); // генерируем бомбы
@@ -1556,6 +1709,10 @@ const GameStart = {
       // пока не нажали кнопку скорость 0, значит стоим на месте
       clearInterval(this.chooseSnake.SpeedLimit);
       clearInterval(this.chooseSnake.fieldAnimationInterval);
+      clearInterval(this.chooseSnake.calllightningAnimationInterval)
+      clearInterval(this.chooseSnake.ElectricInterval);
+      clearInterval(this.chooseSnake.LightningWarningInterval);
+      clearInterval(this.chooseSnake.lightningAnimationInterval);
     }
 
     switch (type) {

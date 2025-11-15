@@ -88,16 +88,16 @@
             border-radius: 30px;
         }
         .frame {
-        margin-top: 0px;
-        border: none;
-        background: transparent; 
-        display: inline-block;
-        position: relative;
-        width: 525px; 
-        border-radius: 10px;
-        border: 5px solid rgb(44, 44, 44);
-        height: 525px;
-        overflow: hidden;
+            margin-top: 0px;
+            border: none;
+            background: transparent; 
+            display: inline-block;
+            position: relative;
+            width: 525px; 
+            border-radius: 10px;
+            border: 5px solid rgb(44, 44, 44);
+            height: 525px;
+            overflow: hidden;
         }
         .game-background {
             position: absolute;
@@ -113,7 +113,21 @@
             height: 100%;
             object-fit: cover;
         }
-
+        .lightning {
+            pointer-events: none;
+        }
+        .lightningAnimation {
+            display: none;
+            width: 32px;
+            height: 32px;
+            pointer-events: none;
+        }
+        .Warning {
+            display: none;
+            width: 32px;
+            height: 32px;
+            pointer-events: none;
+        }
         .fieldOfTheGame {
             white-space: pre;
             font-size: 18px;
@@ -130,7 +144,11 @@
             position: absolute;
             top: 0px; 
         }
-        
+        .lightningAnimation {
+            width: 32px;
+            height: 130px;
+            z-index: 4;
+        }
         #soundOffOn {
             top: 20px;
             left: 450px;
@@ -192,7 +210,6 @@
         }
         .winBox {
             background: linear-gradient(45deg, #2e8b57, #3cb371, #2e8b57);
-            display: flex;
             display: none;
             color: #ffffff;
             animation-delay: 0.1s;
