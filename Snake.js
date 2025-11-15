@@ -286,6 +286,7 @@ class Game {
         item.style.display = 'none';
     });
     this.LightningActive = true;
+    this.pickSoundForAnyGameMechanics('Lightning');
      this.LightningArr.forEach((lightning, index) => {
       const lightningElement = document.getElementById(`lightningAnimation${index + 1}`);
     lightningElement.style.display = 'block';
@@ -342,6 +343,7 @@ class Game {
       soundPlay.play().catch(() => {});
   }
   stopSoundsButton() {
+    this.pickSoundForAnyGameMechanics('buttonSound');
     const soundButton = document.getElementById('soundOffOn');
     const soundImage = soundButton.querySelector('img');
     
@@ -993,6 +995,8 @@ class Game {
         "sound/bomb.mp3",
         "sound/lose.mp3",
         "sound/SoundTrack.mp3",
+        "sound/buttonSound.pm3",
+        "sound/Lightning.mp3",
       ];
       let onloadImagesCount = 0;
       let gameStart = false;
