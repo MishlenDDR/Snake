@@ -176,7 +176,7 @@
         }
         
         .winBox, .loseBox, .restart, #SelectButton, #ButtonDefaultSkin, #ButtonYulyaSkin, #ButtonMamysSkin{
-            width: 260px;
+            width: 250px;
             height: 50px;
             display: none;
             justify-content: center;
@@ -210,10 +210,8 @@
         }
         .winBox {
             background: linear-gradient(45deg, #2e8b57, #3cb371, #2e8b57);
-            display: none;
-            color: #ffffff;
             animation-delay: 0.1s;
-            border-color: #73e656 #346c27 #346c27 #73e656;
+            border: none;
         }
         #SelectButton {
             height: 30px;
