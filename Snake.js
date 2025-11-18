@@ -35,16 +35,19 @@ class Game {
     this.fieldAnimationInterval = null; // инретвал анимации игворого поля, чтобы сбрасывать при перезапуске или смене класса
     this.lightningAnimationInterval = null; // интервал анимации молнии, так же для сброса
     this.LightningWarningInterval = null; // интервал предупреждающей анимации
-    this.calllightningAnimationInterval = null;
-    this.StopLightningInterval = null;
-    this.LightningActive = false;
-    this.WarningActive = false;
-    this.gameStart = false;
-    this.onloadImagesCount = 0;
-    this.flagForLightningActive = true;
-    this.callWarningTimaout = 0;
-    this.backgroundAudio = gameMusic;
+    this.calllightningAnimationInterval = null; // интервал вызова анимации молнии
+    this.StopLightningInterval = null; // интервал остановки анимации молнии
+    this.LightningActive = false; // флаг для столкновений с молнией
+    this.WarningActive = false; // флаг для предупреждений
+    this.gameStart = false; // флаг для запуска музыки и прочего, запускается после прелоадера, один раз за игру
+    this.onloadImagesCount = 0; // счетчик загрузки файлов в прелоадере
+    this.preloadAnimtionInterval = null; // интервал анимации прелоадера
+    this.flagForLightningActive = true; // флаг для активации молнии
+    this.callWarningTimaout = 0; // флаг для начала предепреждения
+    this.flagForStopLightning = true; // флаг для остановки молнии
+    this.backgroundAudio = gameMusic; // передача внешней константы внутрь класса
     this.walls = [
+      // координаты внетренних стен(костра)
       // Левый верхний угол
       { x: 4, y: 4 },
       { x: 5, y: 4 },
@@ -219,9 +222,44 @@ class Game {
     }
     return this.MedKits;
   }
+  lightningAnimationOff() {
+    // останавливаем все таймауты и интервалы для молнии
+    document
+      .querySelectorAll(".Warning, .lightningAnimation")
+      .forEach((item) => {
+        item.style.display = "none";
+      });
+    if (this.LightningWarningInterval) {
+      clearInterval(this.LightningWarningInterval);
+      this.LightningWarningInterval = null;
+    }
+
+    if (this.lightningAnimationInterval) {
+      clearInterval(this.lightningAnimationInterval);
+      this.lightningAnimationInterval = null;
+    }
+
+    if (this.calllightningAnimationInterval) {
+      clearTimeout(this.calllightningAnimationInterval);
+      this.calllightningAnimationInterval = null;
+    }
+
+    if (this.StopLightningInterval) {
+      clearTimeout(this.StopLightningInterval);
+      this.StopLightningInterval = null;
+    }
+
+    if (this.callWarningTimaout) {
+      clearTimeout(this.callWarningTimaout);
+      this.callWarningTimaout = null;
+    }
+    this.WarningActive = false;
+    this.LightningActive = false;
+    this.flagForStopLightning = true;
+  }
   lightningSpawn() {
     this.LightningArr = [];
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 5; i++) {
       let lightning;
       do {
         lightning = [
@@ -274,14 +312,15 @@ class Game {
   }
   startLightningAnimation() {
     this.LightningArr.forEach((lightning, index) => {
+      // для каждой пары координат записываем свой гетЭлемент, каждый на единицу больше, столько будет анимаций сделано
       const lightningElement = document.getElementById(
         `lightningAnimation${index + 1}`
       );
       lightningElement.style.display = "block";
-      lightningElement.style.position = "absolute";
-      lightningElement.style.left = `${lightning[0] * 25}px`;
-      lightningElement.style.top = `${(lightning[1] - 4.4) * 26}px`;
-      lightningElement.style.zIndex = "3";
+      lightningElement.style.position = "absolute"; // появляется скраю поля
+      lightningElement.style.left = `${lightning[0] * 25}px`; // подвинули на то место где сгенерирована молния
+      lightningElement.style.top = `${(lightning[1] - 4.4) * 26}px`; // молния выше чем обычный спрайт, по этому опускаем точку удара по оси Y
+      lightningElement.style.zIndex = "4";
     });
 
     let currentShot = 0;
@@ -300,13 +339,15 @@ class Game {
     }, 70);
   }
   warningItarationPart() {
-    this.lightningSpawn();
-    document.querySelectorAll(".lightningAnimation").forEach((item) => {
-      item.style.display = "none";
-    });
+    if (!this.flagForStopLightning) {
+      // флаг чтобы запускалось только при рестарте и начале
+      return;
+    }
+    this.lightningSpawn(); // генерируем позиции молний
+
     this.WarningActive = true;
 
-    this.startWarningAnimation();
+    this.startWarningAnimation(); // начинаем показывать анимацию предупреждения
 
     if (this.calllightningAnimationInterval) {
       clearTimeout(this.calllightningAnimationInterval);
@@ -317,20 +358,21 @@ class Game {
         clearInterval(this.LightningWarningInterval);
       }
       document.querySelectorAll(".Warning").forEach((item) => {
-        item.style.display = "none";
+        item.style.display = "none"; // скрыли предупреждение по завершении
       });
       this.WarningActive = false;
-      this.lightningAnimation();
-    }, 3000);
+      this.lightningAnimation(); // вызываем молнии
+    }, 3000); // 3 секунды показываем предупреждение
   }
   lightningAnimation() {
-    document.querySelectorAll(".Warning").forEach((item) => {
-      item.style.display = "none";
-    });
-    this.LightningActive = true;
-    this.pickSoundForAnyGameMechanics("Lightning");
+    if (!this.flagForStopLightning) {
+      // флаг чтобы круг не запускался, только если игра закончена, запустится снова
+      return;
+    }
+    this.LightningActive = true; // флаг для сталкновений с молнией когда она активна
+    this.pickSoundForAnyGameMechanics("Lightning"); // вызываем звук
 
-    this.startLightningAnimation();
+    this.startLightningAnimation(); // вызвали анимацию
 
     if (this.StopLightningInterval) {
       clearTimeout(this.StopLightningInterval);
@@ -338,17 +380,18 @@ class Game {
 
     this.StopLightningInterval = setTimeout(() => {
       if (this.lightningAnimationInterval) {
+        // если анимация есть то прекратим
         clearInterval(this.lightningAnimationInterval);
       }
       document.querySelectorAll(".lightningAnimation").forEach((item) => {
-        item.style.display = "none";
+        item.style.display = "none"; // скрываем молнию по завершении
       });
       this.LightningActive = false;
 
       this.callWarningTimaout = setTimeout(() => {
         this.warningItarationPart();
-      }, 6000);
-    }, 2500);
+      }, 4500); // через 4.5 секунд вызываем предупреждающую анимацию
+    }, 2500); // работает молния 2.5 секунд
   }
   FireAnimation() {
     if (this.fireAnimationInterval) {
@@ -363,19 +406,21 @@ class Game {
     soundPlay.volume = 0.03;
     soundPlay.play().catch(() => {});
     soundPlay.onended = () => {
-      sound.remove();
+      soundPlay.remove();
     };
   }
   stopSoundsButton() {
-    this.pickSoundForAnyGameMechanics("buttonSound");
+    this.pickSoundForAnyGameMechanics("buttonSound"); // при нажатии активируем звук кнопки
     const soundButton = document.getElementById("soundOffOn");
     const soundImage = soundButton.querySelector("img");
 
-    if (gameMusic.volume > 0) {
-      gameMusic.volume = 0;
+    if (this.backgroundAudio.volume > 0) {
+      // если звук есть и мы нажали то он выключается и показываем картинку выключения
+      this.backgroundAudio.volume = 0;
       soundImage.src = "images/КнопкиВкл1.png";
     } else {
-      gameMusic.volume = 0.004;
+      // и наоборот
+      this.backgroundAudio.volume = 0.004;
       soundImage.src = "images/КнопкиВкл2.png";
     }
   }
@@ -570,23 +615,20 @@ class Game {
     const images = this.failsWithImages().otherObjects; // передаем все изображения
 
     for (let y = 0; y <= this.FieldMaxY; y++) {
-      // обработка поля по вертикали
-      let row = ""; // строки пустые изанчально
+      let row = "";
       for (let x = 0; x <= this.FieldMaxX; x++) {
-        // обработка по горизонтали
-
         const turnTrue = this.TurnPoints.find(
           (turn) => turn.pos[0] === x && turn.pos[1] === y
-        ); // есть поворот
+        );
         const bodyTrue = this.Body.some(
           (body) => body[0] === x && body[1] === y
-        ); // найден элемент тела
-        const headTrue = y === this.Start[1] && x === this.Start[0]; // найдена голова
+        );
+        const headTrue = y === this.Start[1] && x === this.Start[0];
         const tailTrue =
           this.tail &&
           this.tail.length > 0 &&
           y === this.tail[1] &&
-          x === this.tail[0]; // найден хвост
+          x === this.tail[0];
         const trueApple = this.Apple.some(
           (apple) => apple[0] === x && apple[1] === y
         );
@@ -601,14 +643,12 @@ class Game {
         );
 
         if (headTrue && this.snakeDead) {
-          // если голова существуем и столкновение было
           row += `<img src="${images.explosive}"class="head" width="25" height="25">`; // добавили взрыв если змея врезалась
         } else if (headTrue) {
           row += `<img src="${headImages}"class="head" width="25" height="25">`; // добавили в строку голову
         } else if (tailTrue) {
-          row += `<img src="${tailImages}"class="body" width="25" height="25">`; // добавили в строку хвост
+          row += `<img src="${tailImages}"class="body" width="25" height="25 ">`; // добавили в строку хвост
         } else if (turnTrue) {
-          // есть поворот
           if (turnTrue.from && turnTrue.to) {
             // передача от куда и куда был сделан поворот
             const turnImages = this.findTurnforBody(turnTrue.from, turnTrue.to);
@@ -656,6 +696,7 @@ class Game {
       }, this.Speed);
     }
   }
+
   win() {
     document.getElementById("Win").style.display = "flex"; // показываем картинку с победой
     document.getElementById("restart").style.display = "flex"; // показываем кнопку рестарта
@@ -664,22 +705,34 @@ class Game {
     document.getElementById("ButtonYulyaSkin").style.display = "flex";
     document.getElementById("ButtonMamysSkin").style.display = "flex";
     document.getElementById("soundOffOn").style.display = "flex";
-  }
-  lose() {
-    this.pickSoundForAnyGameMechanics("lose");
+    document.getElementById("soundOffOn").style.display = "flex";
+    this.flagForStopLightning = false;
+    this.pickSoundForAnyGameMechanics("ThatOneWhoWin"); // победный трек
     this.snakeDead = true;
     clearInterval(this.SpeedLimit);
-    document.getElementById("Lose").style.display = "flex"; // показываем кнопку поражения
-    document.getElementById("restart").style.display = "flex"; // показываем кнопку рестарта
-    document.getElementById("SelectButton").style.display = "flex";
-    document.getElementById("ButtonDefaultSkin").style.display = "flex";
-    document.getElementById("ButtonYulyaSkin").style.display = "flex";
-    document.getElementById("ButtonMamysSkin").style.display = "flex";
-    document.getElementById("soundOffOn").style.display = "flex";
+    this.backgroundAudio.volume = 0; // выключили музыку на заднем фоне
+    setTimeout(() => {
+      this.backgroundAudio.volume = 0.004;
+    }, 33000); // включим через 33 секунды
+  }
+  lose() {
+    this.pickSoundForAnyGameMechanics("lose"); // включили звук проигрыша
+    this.snakeDead = true; // змейка мертва
+    this.flagForStopLightning = false; // остановили молнии
+    clearInterval(this.SpeedLimit); // остановили змейку
+    document.getElementById("Lose").style.display = "flex"; // показываем все кнопки
+    document.getElementById("restart").style.display = "flex"; //
+    document.getElementById("SelectButton").style.display = "flex"; //
+    document.getElementById("ButtonDefaultSkin").style.display = "flex"; //
+    document.getElementById("ButtonYulyaSkin").style.display = "flex"; //
+    document.getElementById("ButtonMamysSkin").style.display = "flex"; //
+    document.getElementById("soundOffOn").style.display = "flex"; //
     this.animation(); // для отрисовки взрыва вызываем обновленные сведение про голову
   }
   bombActiveAnimation() {
-    switch (this.countBobmActivate) {
+    switch (
+      this.countBobmActivate // тут просто скрываем сердечки в зависимости от сьеденных бомб
+    ) {
       case 1:
         document.getElementById("Heart3").style.display = "none";
         break;
@@ -692,10 +745,12 @@ class Game {
     }
   }
   MedKitActivate() {
-    switch (this.countBobmActivate) {
+    switch (
+      this.countBobmActivate // тут чтобы сердечки прибавлялись на экран такая логика
+    ) {
       case 1:
-        document.getElementById("Heart3").style.display = "flex";
-        this.countBobmActivate = 0;
+        document.getElementById("Heart3").style.display = "flex"; // если сьели аптечку и сьеденная бомба всего одна, то показываем сердечко самое крайнее
+        this.countBobmActivate = 0; // и устанавливаем счетчик сьедения 0 и так далее
         break;
       case 2:
         document.getElementById("Heart2").style.display = "flex";
@@ -734,11 +789,11 @@ class Game {
       (this.oldDirection = "right"); // старое направление
     this.newDirection = "right"; // новое направление
     this.tail = []; // массив для хвоста
-    this.snakeDead = false;
-    if (this.calllightningAnimationInterval) {
-      clearInterval(this.calllightningAnimationInterval);
-    }
-    this.run();
+    this.snakeDead = false; // змейка снова живая
+    this.lightningAnimationOff(); // выключаем молнии
+    this.flagForStopLightning = true; // выключаем флаг остановки молнии
+    this.flagForLightningActive = true; // включаем флаг для активации молнии
+    this.run(); // запускаем снова игру
   }
   snakeMovement() {
     // обработка нажатия клавишь для движения
@@ -794,42 +849,42 @@ class Game {
 
     this.Start = [...this.NewPos]; // мы обрабатывали NewPos для перемещения, теперь приравниваем чтобы голова имела новое значение
     this.Body.push([...this.oldHead]); // тело принмиает значение старой позиции головы, как бы движется за ней
-    this.bodyDirections.push(this.oldDirection);
+    this.bodyDirections.push(this.oldDirection); // направление тело такое как и старое, до обновление
   }
   GameMechanics() {
-    if (this.count === 400) {
+    if (this.count === 800) {
+      // для победы 80 яблок нужно сьесть, да не мало, но змейка особо легкой не была
       this.win();
+      this.lightningAnimationOff(); // вырубаем ток
+      this.flagForStopLightning = fasle; // вырубаем как можем ток
       return;
     }
 
     if (
-      // Голова столкнулась с телом (КРОМЕ последнего сегмента)
       this.Body.slice(0, -1).some(
+        // если элемент тела столкнулся с головой то проиграли, обрезаем первый элемент чтобы сначала игры тело не врезалось автоматически в голову
         (body) => body[0] === this.Start[0] && body[1] === this.Start[1]
       ) ||
-      // ИЛИ активировано 3 бомбы
-      this.countBobmActivate === 3
+      this.countBobmActivate === 3 // или сьели 3 бомбы
     ) {
       this.lose();
+      this.flagForStopLightning = fasle;
+      this.lightningAnimationOff();
       return;
     }
-
+    // проверки на то что мы зашли в какой то обьект
     const eatenApple = this.Apple.findIndex(
-      (
-        apple // проверяем что координаты яблока совпадают с головой значит сьели яблоко
-      ) => apple[0] === this.Start[0] && apple[1] === this.Start[1]
+      (apple) => apple[0] === this.Start[0] && apple[1] === this.Start[1]
     );
 
     const bombActive = this.Bomb.findIndex(
       (
-        bomb // проверяем про прошли через бомбу
+        bomb // проверяем что прошли через бомбу
       ) => bomb[0] === this.Start[0] && bomb[1] === this.Start[1]
     );
 
     const eatenMed = this.MedKits.findIndex(
-      (
-        med // проверка на аптечку
-      ) => med[0] === this.Start[0] && med[1] === this.Start[1]
+      (med) => med[0] === this.Start[0] && med[1] === this.Start[1]
     );
 
     const WallActive = this.walls.findIndex(
@@ -868,56 +923,61 @@ class Game {
     if (oldTailPos) {
       // если старый хвост теперь первый элемент тела
       if (this.count <= 0) {
-        // если яблоко яблоко не сьели, значит изначально голова + хвост
         this.tailDirection = this.direction; // хвост четко движется за головой
       } else {
         const turnIndex = this.TurnPoints.findIndex(
+          // ищем индекс где хвост должен поменять направление
           (turn) =>
             turn.pos[0] === oldTailPos[0] && turn.pos[1] === oldTailPos[1]
-        ); // если он проходит через координаты поворота
+        );
 
         if (turnIndex !== -1) {
-          // если да то удаляем поворот
+          // нашли
+
           this.tailDirection = this.TurnPoints[turnIndex].to; // и поменяли направление хвоста там где он проходит через поворот
           this.TurnPoints.splice(turnIndex, 1); // очищаем старый поворот
         }
       }
     }
     this.Body.forEach((segment, index) => {
-      // ищем тело которое пересекает поворот
       const turn = this.TurnPoints.find(
+        // ищем тело которое пересекает поворот
         (turn) => turn.pos[0] === segment[0] && turn.pos[1] === segment[1]
       );
 
       if (turn) {
-        // если нашли то меняем конкретный пройденный через поворот сегмент тела на новое наравление
-        this.bodyDirections[index] = turn.to;
+        this.bodyDirections[index] = turn.to; // если нашли то меняем конкретный пройденный через поворот сегмент тела на новое наравление
       }
     });
     if (bombActive !== -1) {
-      this.Bomb.splice(bombActive, 1);
-      this.Bomb.push(...this.addBombs());
-      this.countBobmActivate++;
-      this.bombActiveAnimation();
-      this.pickSoundForAnyGameMechanics("bomb");
+      // попали на бомбу
+      this.Bomb.splice(bombActive, 1); // убираем первую бомбу в массве
+      this.Bomb.push(...this.addBombs()); // добавляем еще бомбы которые генерит функция this.addBombs(), она возвращает вложенный масив так что точки нужно чтобы его распаковать
+      this.countBobmActivate++; // добавилии счетчик бомб
+      this.bombActiveAnimation(); // вызвали его для проверки
+      this.pickSoundForAnyGameMechanics("bomb"); // запустили звук активации бомбы
     }
     if (eatenMed !== -1) {
+      // сьели аптечку плюс жизнь и убираем одну из массива аптечек
+      this.pickSoundForAnyGameMechanics("MedKit");
       this.MedKits.splice(eatenMed, 1);
       this.MedKitActivate();
     }
     if (WallActive !== -1) {
+      // столкновение со стеной = смерть
       this.lose();
       return;
     }
     if (LightningHit !== -1 && !this.WarningActive && this.LightningActive) {
+      // если зашли в молнию и предупреждения нет, а молния есть то смерть
       this.lose();
       return;
     }
   }
   movement() {
-    this.snakeMovement();
-    this.GameMechanics();
-    this.animation();
+    this.snakeMovement(); // сначала вызываем движение и перезапись
+    this.GameMechanics(); // потом проверки на столкновения и прибавление очков и тд
+    this.animation(); // потом отрисовываем что вышло
   }
   fieldAnimation() {
     if (this.fieldAnimationInterval) {
@@ -933,10 +993,11 @@ class Game {
     }, 350);
   }
   preloadAnimtion() {
+    // сама анимация на загрузке
     let currentShot = 0;
-    setInterval(() => {
+    this.preloadAnimtionInterval = setInterval(() => {
       currentShot =
-        (currentShot + 1) %
+        (currentShot + 1) % // 0 + 1 % 6 = 1 и так далее прибавляется единица и показывается каждые 0.4 секунды кадр на 1 больше по счету, в последовательности кадров
         this.failsWithImages().otherObjects.preloadAnimationImages.length;
       document.getElementById("preloadAnimation").src =
         this.failsWithImages().otherObjects.preloadAnimationImages[currentShot];
@@ -945,7 +1006,8 @@ class Game {
 
   preloadImages() {
     if (!preloaderWas) {
-      this.preloadAnimtion();
+      // простой флаг что загрузки не было при старте игры
+      this.preloadAnimtion(); // вызываем анимацию загрузки
       const imagePreload = [
         "images/ГоловаВверх.png",
         "images/ГоловаВниз.png",
@@ -1025,29 +1087,34 @@ class Game {
         "sound/SoundTrack.mp3",
         "sound/buttonSound.pm3",
         "sound/Lightning.mp3",
+        "sound/ThatOneWhoWin.mp3",
+        "sound/MedKit.mp3",
       ];
 
       imagePreload.forEach((item) => {
+        // каждый файл обрабатываем
         const img = new Image();
         img.onload = img.onerror = () => {
-          this.onloadImagesCount++;
+          // обрабатывает и загрузки и ошибки
+          this.onloadImagesCount++; // счетчик загруженных или зафейленных
         };
         img.src = item;
       });
       setTimeout(() => {
         if (this.onloadImagesCount === imagePreload.length && !this.gameStart) {
+          // если все загрузилось то экран скипнется
           this.hidePreloadScreen();
         }
-      }, 6000);
+      }, 6000); // через 6 секунд показываем игровое поле
     } else {
       document.getElementById("preloadScreen").style.display = "none";
     }
   }
 
   hidePreloadScreen() {
+    // скрывает экран загрузки
     if (!this.gameStart) {
-      this.gameStart = true;
-      this.startMenuDisplay();
+      this.gameStart = true; // запускается один раз при загрузке
       const preloadScreen = document.getElementById("preloadScreen");
       preloadScreen.style.transition = "opacity 0.2s ease-in-out";
       preloadScreen.style.opacity = "0";
@@ -1056,28 +1123,25 @@ class Game {
       setTimeout(() => {
         preloadScreen.style.display = "none";
       }, 200);
-      this.playBackgraundMusic();
       this.startMenuDisplay();
+      this.playBackgraundMusic();
     }
   }
   playBackgraundMusic() {
+    // запуск музыки, запускается один раз с флагом this.gameStart
     if (this.gameStart) {
       gameMusic.play().catch(() => {});
     }
   }
   startMenuDisplay() {
     if (this.gameStart) {
-      document.getElementById("restart").style.display = "flex"; // показываем кнопку рестарта
+      document.getElementById("restart").style.display = "flex";
       document.getElementById("SelectButton").style.display = "flex";
       document.getElementById("ButtonDefaultSkin").style.display = "flex";
       document.getElementById("ButtonYulyaSkin").style.display = "flex";
       document.getElementById("ButtonMamysSkin").style.display = "flex";
       document.getElementById("soundOffOn").style.display = "flex";
-    }
-  }
-  startLightningCircle() {
-    if (!this.flagForLightningActive) {
-      this.warningItarationPart();
+      document.getElementById("ButtonSoloSkin").style.display = "flex";
     }
   }
   control() {
@@ -1100,22 +1164,22 @@ class Game {
 
       if (this.flagForLightningActive) {
         this.flagForLightningActive = false;
-        this.startLightningCircle();
+        this.warningItarationPart(); // запускаем цикл только при первом запуске класса
       }
     });
   }
   run() {
-    this.preloadImages();
-    this.control();
+    this.preloadImages(); // запуск загрузки изображения
+    this.control(); // запуск ввода с клавиатуры
     this.start(); // сгенерировали голову
     this.apple(); // сгенерировали яблоки
     this.bombGeneration(); // генерируем бомбы
     this.MedKitSpawn(); // спавн аптечек
     this.FireAnimation();
     this.animation(); // рисуем их
-    this.fieldAnimation();
+    this.fieldAnimation(); // запуск анимации поля
     this.SpeedLimit = setInterval(() => {
-      this.movement();
+      this.movement(); // запускаем функцию движения и условия столкновений и сьедений обьектов
     }, this.Speed);
   }
 }
@@ -1324,6 +1388,7 @@ class PrincessSkin extends Game {
     document.getElementById("ButtonYulyaSkin").style.display = "none";
     document.getElementById("ButtonMamysSkin").style.display = "none";
     document.getElementById("soundOffOn").style.display = "none";
+    document.getElementById("ButtonSoloSkin").style.display = "none";
     clearInterval(this.SpeedLimit); // сбрасываем все накопившиеся за время игры услови
     this.Speed = 250; // тут
     this.Start = []; // тут
@@ -1567,6 +1632,7 @@ class MamysSkin extends Game {
     document.getElementById("ButtonYulyaSkin").style.display = "none";
     document.getElementById("ButtonMamysSkin").style.display = "none";
     document.getElementById("soundOffOn").style.display = "none";
+    document.getElementById("ButtonSoloSkin").style.display = "none";
     clearInterval(this.SpeedLimit); // сбрасываем все накопившиеся за время игры условия
     this.Speed = 350; // тут
     this.Start = []; // тут
@@ -1637,8 +1703,8 @@ class MamysSkin extends Game {
         this.NewPos = [...this.Start];
     }
 
-    this.Start = [...this.NewPos]; // мы обрабатывали NewPos для перемещения, теперь приравниваем чтобы голова имела новое значение
-    this.Body.push([...this.oldHead]); // тело принмиает значение старой позиции головы, как бы движется за ней
+    this.Start = [...this.NewPos]; 
+    this.Body.push([...this.oldHead]); 
     this.bodyDirections.push(this.oldDirection);
   }
   GameMechanics() {
@@ -1659,7 +1725,7 @@ class MamysSkin extends Game {
 
     const eatenApple = this.Apple.findIndex(
       (
-        apple // проверяем что координаты яблока совпадают с головой значит сьели яблоко
+        apple 
       ) => apple[0] === this.Start[0] && apple[1] === this.Start[1]
     );
 
@@ -1671,7 +1737,7 @@ class MamysSkin extends Game {
 
     const eatenMed = this.MedKits.findIndex(
       (
-        med // проверка на аптечку
+        med 
       ) => med[0] === this.Start[0] && med[1] === this.Start[1]
     );
 
@@ -1759,58 +1825,44 @@ class MamysSkin extends Game {
     }, this.Speed);
   }
 }
-
 const GameStart = {
   // класс для смены классов
   chooseSnake: 0, //
 
   SelectSnakes(type) {
     // получаем в эту функцию параметр из html файла в зависимости от кнопки которую нажали
-
     if (this.chooseSnake) {
-      // пока не нажали кнопку скорость 0, значит стоим на месте
+      // очищаем молнии
       clearInterval(this.chooseSnake.SpeedLimit);
       clearInterval(this.chooseSnake.fieldAnimationInterval);
-      clearTimeout(this.chooseSnake.calllightningAnimationInterval);
-      clearTimeout(this.chooseSnake.StopLightningInterval);
-      clearInterval(this.chooseSnake.LightningWarningInterval);
-      clearInterval(this.chooseSnake.lightningAnimationInterval);
-      clearTimeout(this.chooseSnake.callWarningTimaout);
-      document.querySelectorAll(".Warning").forEach((item) => {
-        item.style.display = "none";
-      });
-      document.querySelectorAll(".lightningAnimation").forEach((item) => {
-        item.style.display = "none";
-      });
     }
-
     switch (type) {
       case "default":
-        this.chooseSnake = new Game(); // основная змея
+        this.chooseSnake = new Game();
         break;
       case "Yulya":
         this.chooseSnake = new PrincessSkin();
         break;
       case "Mamys":
         this.chooseSnake = new MamysSkin();
+        break;
     }
-    this.chooseSnake.backgroundAudio = gameMusic;
     this.chooseSnake.pickSoundForAnyGameMechanics("buttonSound");
     this.chooseSnake.run(); // запускаем игру с определенным классом
   },
   soundButtonClass() {
     if (this.chooseSnake) {
-      this.chooseSnake.stopSoundsButton();
+      this.chooseSnake.stopSoundsButton(); // вызываем кнопку звука для выбранного класса, чтобы избежать наложения
     }
   },
 
   GlobalRestart() {
     if (this.chooseSnake) {
-      this.chooseSnake.restartButton();
+      this.chooseSnake.restartButton(); // вызываем рестарт для выбранного класса
     }
   },
 };
 
 window.addEventListener("DOMContentLoaded", () => {
-  GameStart.SelectSnakes("default"); // запускаем обычную игру изначально при открытии страницы
+  GameStart.SelectSnakes("default");
 });

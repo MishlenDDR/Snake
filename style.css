@@ -175,7 +175,7 @@
             z-index: 3; 
         }
         
-        .winBox, .loseBox, .restart, #SelectButton, #ButtonDefaultSkin, #ButtonYulyaSkin, #ButtonMamysSkin{
+        .winBox, .loseBox, .restart, #SelectButton, #ButtonDefaultSkin, #ButtonYulyaSkin, #ButtonMamysSkin, #ButtonSoloSkin{
             width: 250px;
             height: 50px;
             display: none;
@@ -188,7 +188,7 @@
             font-family: 'Silkscreen', cursive;
             opacity: 0;
             transform: translateY(20px);
-            animation: fadeInUp 0.5s ease forwards;
+            animation: fadeInUp 0.4s ease forwards;
             image-rendering: pixelated;
             -webkit-font-smoothing: none;
             -moz-osx-font-smoothing: grayscale;
@@ -276,6 +276,21 @@
             box-shadow: 2px 2px 0px #251041;
             transform: translate(3px, 3px) !important;
         }
-        
-        
+        #ButtonSoloSkin {
+            background: linear-gradient(45deg, #25d873, #c8e43a);
+            cursor: pointer;
+            animation-delay: 1.25s;
+            box-shadow: 5px 5px 0px #251041;
+            border-color: #67e58d #477b57 #477b57 #67e58d;
+            width: 50px;
+            height: 50px;
+            font-size: 8px;
+        }
+        #ButtonSoloSkin:hover {
+            background: linear-gradient(45deg, #1c9751, #f5bc4a);
+        }
+        #ButtonSoloSkin:active {
+            box-shadow: 2px 2px 0px #251041;
+            transform: translate(3px, 3px) !important;
+        }
     
