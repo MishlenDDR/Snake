@@ -319,7 +319,7 @@ class Game {
       lightningElement.style.position = "absolute"; // появляется скраю поля
       lightningElement.style.left = `${lightning[0] * 25}px`; // подвинули на то место где сгенерирована молния
       lightningElement.style.top = `${(lightning[1] - 4.4) * 26}px`; // молния выше чем обычный спрайт, по этому опускаем точку удара по оси Y
-      lightningElement.style.zIndex = "4";
+      lightningElement.style.zIndex = "3";
     });
 
     let currentShot = 0;
