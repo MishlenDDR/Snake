@@ -1,6 +1,6 @@
 let preloaderWas = false;
 const gameMusic = new Audio("sound/SoundTrack.mp3");
-gameMusic.volume = 0.004;
+gameMusic.volume = 0.005;
 gameMusic.loop = true;
 class Game {
   constructor() {
@@ -45,7 +45,6 @@ class Game {
     this.flagForLightningActive = true; // флаг для активации молнии
     this.callWarningTimaout = 0; // флаг для начала предепреждения
     this.flagForStopLightning = true; // флаг для остановки молнии
-    this.backgroundAudio = gameMusic; // передача внешней константы внутрь класса
     this.walls = [
       // координаты внетренних стен(костра)
       // Левый верхний угол
@@ -413,14 +412,15 @@ class Game {
     this.pickSoundForAnyGameMechanics("buttonSound"); // при нажатии активируем звук кнопки
     const soundButton = document.getElementById("soundOffOn");
     const soundImage = soundButton.querySelector("img");
+    
 
-    if (this.backgroundAudio.volume > 0) {
+    if (gameMusic.volume > 0) {
       // если звук есть и мы нажали то он выключается и показываем картинку выключения
-      this.backgroundAudio.volume = 0;
+      gameMusic.volume = 0;
       soundImage.src = "images/КнопкиВкл1.png";
     } else {
       // и наоборот
-      this.backgroundAudio.volume = 0.004;
+      gameMusic.volume = 0.004;
       soundImage.src = "images/КнопкиВкл2.png";
     }
   }
@@ -607,7 +607,7 @@ class Game {
 
   animation() {
     // отрисовка элементов
-    // console.clear(); // очищаем консоль для оптимизации
+     console.clear(); // очищаем консоль для оптимизации
     let field = ""; // строки поля изначально пустые
 
     const headImages = this.findTurnHead(); // передаем картинки головы
@@ -710,9 +710,9 @@ class Game {
     this.pickSoundForAnyGameMechanics("ThatOneWhoWin"); // победный трек
     this.snakeDead = true;
     clearInterval(this.SpeedLimit);
-    this.backgroundAudio.volume = 0; // выключили музыку на заднем фоне
+    gameMusic.volume = 0; // выключили музыку на заднем фоне
     setTimeout(() => {
-      this.backgroundAudio.volume = 0.004;
+      gameMusic.volume = 0.004;
     }, 33000); // включим через 33 секунды
   }
   lose() {
@@ -1085,7 +1085,7 @@ class Game {
         "sound/bomb.mp3",
         "sound/lose.mp3",
         "sound/SoundTrack.mp3",
-        "sound/buttonSound.pm3",
+        "sound/buttonSound.mp3",
         "sound/Lightning.mp3",
         "sound/ThatOneWhoWin.mp3",
         "sound/MedKit.mp3",
@@ -1123,25 +1123,6 @@ class Game {
       setTimeout(() => {
         preloadScreen.style.display = "none";
       }, 200);
-      this.startMenuDisplay();
-      this.playBackgraundMusic();
-    }
-  }
-  playBackgraundMusic() {
-    // запуск музыки, запускается один раз с флагом this.gameStart
-    if (this.gameStart) {
-      gameMusic.play().catch(() => {});
-    }
-  }
-  startMenuDisplay() {
-    if (this.gameStart) {
-      document.getElementById("restart").style.display = "flex";
-      document.getElementById("SelectButton").style.display = "flex";
-      document.getElementById("ButtonDefaultSkin").style.display = "flex";
-      document.getElementById("ButtonYulyaSkin").style.display = "flex";
-      document.getElementById("ButtonMamysSkin").style.display = "flex";
-      document.getElementById("soundOffOn").style.display = "flex";
-      document.getElementById("ButtonSoloSkin").style.display = "flex";
     }
   }
   control() {
@@ -1165,6 +1146,11 @@ class Game {
       if (this.flagForLightningActive) {
         this.flagForLightningActive = false;
         this.warningItarationPart(); // запускаем цикл только при первом запуске класса
+      }
+      if(this.gameStart) {
+         gameMusic.play().catch(() => {
+      });
+      this.gameStart = false;
       }
     });
   }
@@ -1388,7 +1374,6 @@ class PrincessSkin extends Game {
     document.getElementById("ButtonYulyaSkin").style.display = "none";
     document.getElementById("ButtonMamysSkin").style.display = "none";
     document.getElementById("soundOffOn").style.display = "none";
-    document.getElementById("ButtonSoloSkin").style.display = "none";
     clearInterval(this.SpeedLimit); // сбрасываем все накопившиеся за время игры услови
     this.Speed = 250; // тут
     this.Start = []; // тут
@@ -1528,7 +1513,7 @@ class MamysSkin extends Game {
   }
   animation() {
     // отрисовка элементов
-    console.clear(); // очищаем консоль для оптимизации
+   // console.clear(); // очищаем консоль для оптимизации
     let field = ""; // строки поля изначально пустые
 
     const headImages = this.findTurnHead(); // передаем картинки головы
@@ -1632,7 +1617,6 @@ class MamysSkin extends Game {
     document.getElementById("ButtonYulyaSkin").style.display = "none";
     document.getElementById("ButtonMamysSkin").style.display = "none";
     document.getElementById("soundOffOn").style.display = "none";
-    document.getElementById("ButtonSoloSkin").style.display = "none";
     clearInterval(this.SpeedLimit); // сбрасываем все накопившиеся за время игры условия
     this.Speed = 350; // тут
     this.Start = []; // тут
